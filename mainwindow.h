@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QTextEdit>
+#include <QSettings>
 
 #include "qdebugstream.h"
 
@@ -22,6 +23,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void closeEvent(QCloseEvent *event);
+
+protected:
+    void saveSettings();
+    void getSettings();
 
 private:
     void deletePlots();
@@ -46,9 +51,13 @@ private:
     QDebugStream*   pOut;
     Plot2D*         pPlotA;
     Plot2D*         pPlotV;
+    QString         sDataDir;
+    QSettings       settings;
 
     std::vector<double> theAlfaS;
     std::vector<double> theTemperatures;
+    std::vector<double> theFit;
+
     int nDati;
     double omega, cost, t0;
 };

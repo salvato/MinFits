@@ -8,10 +8,11 @@
 #include "Minuit2/MnUserParameters.h"
 #include "Minuit2/MnPrint.h"
 
-#include <iostream>
-#include <fstream>
 #include <QFileDialog>
+#include <QTextStream>
+#include <QFile>
 #include <math.h>
+
 
 using namespace ROOT;
 using namespace Minuit2;
@@ -29,7 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
     pConsole = new QTextEdit();
     pConsole->document()->setMaximumBlockCount(10000);
     pConsole->show();
-    pOut = new QDebugStream(std::cout, pConsole);
+    //pOut = new QDebugStream(std::cout, pConsole);
+    getSettings();
 }
 
 
@@ -44,6 +46,7 @@ MainWindow::~MainWindow() {
 void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
+    saveSettings();
     if(ui) delete ui;
     ui = nullptr;
     if(pOut) delete pOut;
@@ -60,6 +63,20 @@ MainWindow::deletePlots() {
     pPlotA = nullptr;
     if(pPlotV) delete pPlotV;
     pPlotV = nullptr;
+}
+
+
+void
+MainWindow::getSettings() {
+    restoreGeometry(settings.value(QString("MainWindow_Dialog")).toByteArray());
+    sDataDir = settings.value("Data_Dir",   QDir::currentPath()).toString();
+}
+
+
+void
+MainWindow::saveSettings() {
+    settings.setValue(QString("MainWindow_Dialog"), saveGeometry());
+    settings.setValue("Data_Dir", sDataDir);
 }
 
 
@@ -125,28 +142,33 @@ MainWindow::on_SummCos_clicked() {
     deletePlots();
     if(!readSummCosFile())
         return;
-    SummCosFunction summCos(theTemperatures,
-                            theAlfaS,
-                            omega,
-                            cost,
-                            t0);
-
-    MnUserParameters upar;
-    upar.Add("BETA1",       1.108, 0.2088,   0.2,   5.0);
-    upar.Add("BETA2",      10.520, 0.1315,   0.1,   1.0);
-    upar.Add("TM(+3)",      2.172, 0.11327,  1.0,   7.0);
-    upar.Add("TAU(-14)",    3.1,   0.90082,  0.1,  20.0);
-    upar.Add("COST1(-3)",   9.446, 2.007,    0.1,  20.0);
-    upar.Add("T00",       258.3,   4.2876, 100.0, 400.0);
-
-    MnMigrad migrad(summCos, upar);
-    FunctionMinimum min = migrad();
-    std::cout << "minimum: " << min << std::endl;
-
     pPlotA = new Plot2D(nullptr, "SummCos");
     pPlotA->SetLimits(0.0, 0.1, 0.0, 1.0, true, true, false, false);
     pPlotA->UpdatePlot();
     pPlotA->show();
+
+    theFit.clear();
+    theFit.resize(theAlfaS.size());
+    SummCosFunction summCos(theTemperatures,
+                            theAlfaS,
+                            &theFit,
+                            omega,
+                            cost,
+                            t0,
+                            pPlotA);
+
+    MnUserParameters upar;
+    upar.Add("BETA1",       1.108, 0.20880,   0.2,   5.0);
+    upar.Add("BETA2",      10.520, 0.13150,   0.45,  0.58);
+    upar.Add("TM(+3)",      2.172, 0.11327,   1.0,   7.0);
+    upar.Add("TAU(-14)",    3.100, 0.90082,   0.1,  20.0);
+    upar.Add("COST1(-3)",   9.446, 2.00700,   0.1,  20.0);
+    upar.Add("T00",       258.300, 4.28760, 100.0, 400.0);
+
+    MnMigrad migrad(summCos, upar);
+    FunctionMinimum min = migrad();
+    std::cout << "minimum: " << min << std::endl;
+    summCos.Plot(min.UserParameters().Params());
 }
 
 
@@ -176,31 +198,33 @@ MainWindow::on_exp_T_clicked() {
 
 bool
 MainWindow::readAlfaSFile() {
-    QString sDataDir =QString();
-    statusBar()->showMessage("Select AlfaS File...", 0);
-    QFileDialog chooseFileDialog;
-    QString sFilename = chooseFileDialog.getOpenFileName(nullptr,
-                                                         "Choose SummCos Data File",
-                                                         sDataDir,
-                                                         "Summ Cos Data files (*.dat *.txt)",
-                                                         nullptr);
+    statusBar()->showMessage("Choose AlfaS Data File...", 0);
+    QFileDialog chooseFileDialog(nullptr,
+                                 "Open AlfaS Data File",
+                                 sDataDir,
+                                 "AlfaS Data files (*.dat *.txt)");
+    chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
+    if(!chooseFileDialog.exec())
+        return false;
     statusBar()->clearMessage();
+
+    QString sFilename = chooseFileDialog.selectedFiles().at(0);
     if(sFilename == QString())
         return false;
 
-    ifstream dataFile;
-    dataFile.open(sFilename.toLatin1(), ios::in);
-    if(!dataFile) {
-        statusBar()->showMessage("Error in Opening Data File", 3000);
+    QFile dataFile(sFilename);
+    if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        statusBar()->showMessage("Error Opening Data File", 3000);
         return false;
     }
+    QTextStream inFileStream(&dataFile);
     try {
-        dataFile >> nDati >> omega;
+        inFileStream >> nDati >> omega;
         theAlfaS.empty();
         theTemperatures.empty();
         double t, alfaS;
-        while(!dataFile.eof()) {
-            dataFile >> t >> alfaS;
+        while(!inFileStream.atEnd()) {
+            inFileStream >> t >> alfaS;
             theTemperatures.push_back(t);
             theAlfaS.push_back(alfaS);
         }
@@ -221,33 +245,36 @@ MainWindow::readAlfaSFile() {
 
 bool
 MainWindow::readSummCosFile() {
-    QString sDataDir =QString();
     statusBar()->showMessage("Choose SummCos Data File...", 0);
-    QFileDialog chooseFileDialog;
-
-    QString sFilename = chooseFileDialog.getOpenFileName(nullptr,
-                                                         "Choose SummCos Data File",
-                                                         sDataDir,
-                                                         "Summ Cos Data files (*.dat *.txt)",
-                                                         nullptr);
+    QFileDialog chooseFileDialog(nullptr,
+                                 "Open SUMM-COS Data File",
+                                 sDataDir,
+                                 "Summ Cos Data files (*.dat *.txt)");
+    chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
+    if(!chooseFileDialog.exec())
+        return false;
     statusBar()->clearMessage();
+
+    QString sFilename = chooseFileDialog.selectedFiles().at(0);
     if(sFilename == QString())
         return false;
 
-    ifstream dataFile;
-    dataFile.open(sFilename.toLatin1(), ios::in);
-    if(!dataFile) {
-      statusBar()->showMessage("Error in Opening Data File", 3000);
+    sDataDir = chooseFileDialog.directory().absolutePath();
+    settings.setValue("Data_Dir", sDataDir);
+    QFile dataFile(sFilename);
+    if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      statusBar()->showMessage("Error Opening Data File", 3000);
       return false;
     }
+    QTextStream inFileStream(&dataFile);
     try {
-        theAlfaS.empty();
-        theTemperatures.empty();
+        theAlfaS.clear();
+        theTemperatures.clear();
         double t, alfaS;
-        dataFile >> omega;
-        omega *= acos(-1.0);
-        while(!dataFile.eof()) {
-            dataFile >> t >> alfaS;
+        inFileStream >> omega;
+        omega *= 2.0*M_PI;
+        while(!inFileStream.atEnd()) {
+            inFileStream >> t >> alfaS;
             theTemperatures.push_back(t);
             theAlfaS.push_back(alfaS);
         }
