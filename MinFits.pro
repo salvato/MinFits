@@ -21,6 +21,7 @@ SOURCES += \
     gammln.cpp \
     main.cpp \
     mainwindow.cpp \
+    msgwindow.cpp \
     parameterline.cpp \
     parameterswindow.cpp \
     plot2d.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     dceul.h \
     gammln.h \
     mainwindow.h \
+    msgwindow.h \
     parameterline.h \
     parameterswindow.h \
     plot2d.h \

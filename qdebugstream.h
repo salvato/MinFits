@@ -30,4 +30,3 @@ private:
     std::streambuf* m_old_buf;
     QTextEdit*      log_window;
 };
-

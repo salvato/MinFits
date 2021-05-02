@@ -28,11 +28,12 @@ protected:
 
 private:
 
-public:
-
 private slots:
     void on_SummCos_clicked();
     void onFitDone();
+
+public:
+    QTextEdit* pConsole;
 
 private:
     Ui::MainWindow*   pUi;

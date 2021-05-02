@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-
+#include <iostream>
+#include <fstream>
 #include <QFileDialog>
 #include <QTextStream>
 #include <QFile>
@@ -14,12 +15,17 @@ using namespace Minuit2;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , pConsole(nullptr)
     , pUi(new Ui::MainWindow)
     , pOut(nullptr)
     , pParams(nullptr)
 {
     pUi->setupUi(this);
     getSettings();
+    pConsole = new QTextEdit();
+    pConsole->document()->setMaximumBlockCount(10000);
+    pConsole->show();
+    pOut = new QDebugStream(std::cout, pConsole);
 }
 
 
@@ -27,6 +33,7 @@ MainWindow::~MainWindow() {
     if(pUi) delete pUi;
     if(pOut) delete pOut;
     if(pParams) delete pParams;
+    if(pConsole) delete pConsole;
 }
 
 
@@ -40,6 +47,8 @@ MainWindow::closeEvent(QCloseEvent *event) {
     pOut = nullptr;
     if(pParams) delete pParams;
     pParams = nullptr;
+    if(pConsole) delete pConsole;
+    pConsole = nullptr;
 }
 
 

@@ -5,6 +5,7 @@
 #include "Minuit2/MnUserParameters.h"
 #include "Minuit2/MnPrint.h"
 
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -83,20 +84,25 @@ ParametersWindow::getParams() {
 void
 ParametersWindow::onFit() {
     if(!bInitialized) {
-        if(!pSummCos->readDataFile()) {
+        if(!pSummCos->readDataFile())
             return;
-        }
-        bInitialized = true;
     }
+    QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
+    setDisabled(true);
+    bInitialized = true;
     MnMigrad migrad(*pSummCos, getParams());
     FunctionMinimum min = migrad();
     std::cout << "minimum: " << min << std::endl;
     pSummCos->Plot(min.UserParameters().Params());
     MnUserParameterState optimum = min.UserState();
-    for(unsigned int i=0; i<min.UserParameters().Params().size(); i++) {
-        parLine.at(i)->setInitialValue(min.UserParameters().Value(i));
-        parLine.at(i)->setErrorValue(min.UserParameters().Error(i));
+    if(qIsFinite(optimum.Edm())) {
+        for(unsigned int i=0; i<optimum.Params().size(); i++) {
+            parLine.at(i)->setInitialValue(optimum.Value(i));
+            parLine.at(i)->setErrorValue(optimum.Error(i));
+        }
     }
+    QApplication::restoreOverrideCursor();
+    setEnabled(true);
 }
 
 
