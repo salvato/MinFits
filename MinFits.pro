@@ -19,8 +19,8 @@ SOURCES += \
     datastream2d.cpp \
     main.cpp \
     mainwindow.cpp \
+    parameterline.cpp \
     parameterswindow.cpp \
-    paramterline.cpp \
     plot2d.cpp \
     plotpropertiesdlg.cpp \
     qdebugstream.cpp \
@@ -34,8 +34,8 @@ HEADERS += \
     axesdialog.h \
     datastream2d.h \
     mainwindow.h \
+    parameterline.h \
     parameterswindow.h \
-    paramterline.h \
     plot2d.h \
     plotpropertiesdlg.h \
     qdebugstream.h \

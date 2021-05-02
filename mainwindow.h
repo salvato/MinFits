@@ -5,6 +5,7 @@
 #include <QSettings>
 
 #include "qdebugstream.h"
+#include "parameterswindow.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -53,6 +54,7 @@ private:
     Plot2D*         pPlotV;
     QString         sDataDir;
     QSettings       settings;
+    ParametersWindow* pParams;
 
     std::vector<double> theAlfaS;
     std::vector<double> theTemperatures;

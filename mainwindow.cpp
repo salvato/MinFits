@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     , pOut(nullptr)
     , pPlotA(nullptr)
     , pPlotV(nullptr)
+    , pParams(nullptr)
 {
     ui->setupUi(this);
     pConsole = new QTextEdit();
@@ -39,6 +40,7 @@ MainWindow::~MainWindow() {
     if(ui) delete ui;
     if(pOut) delete pOut;
     if(pConsole) delete pConsole;
+    if(pParams) delete pParams;
     deletePlots();
 }
 
@@ -53,7 +55,9 @@ MainWindow::closeEvent(QCloseEvent *event) {
     pOut = nullptr;
     if(pConsole) delete pConsole;
     pConsole = nullptr;
-    deletePlots() ;
+    if(pParams) delete pParams;
+    pParams = nullptr;
+    deletePlots();
 }
 
 
@@ -140,6 +144,15 @@ MainWindow::on_Schottky_clicked() {
 void
 MainWindow::on_SummCos_clicked() {
     deletePlots();
+    pParams = new ParametersWindow("Fit Parameters", nullptr);
+    pParams->Add("BETA1",       1.108, 0.20880,   0.2,   5.00, false);
+    pParams->Add("BETA2",      10.520, 0.13150,   0.45,  0.58, false);
+    pParams->Add("TM(+3)",      2.172, 0.11327,   1.0,   7.00, false);
+    pParams->Add("TAU(-14)",    3.100, 0.90082,   0.1,  20.00, false);
+    pParams->Add("COST1(-3)",   9.446, 2.00700,   0.1,  20.00, false);
+    pParams->Add("T00",       258.300, 4.28760, 100.0, 400.00, false);
+    pParams->show();
+
     if(!readSummCosFile())
         return;
     pPlotA = new Plot2D(nullptr, "SummCos");
@@ -157,18 +170,11 @@ MainWindow::on_SummCos_clicked() {
                             t0,
                             pPlotA);
 
-    MnUserParameters upar;
-    upar.Add("BETA1",       1.108, 0.20880,   0.2,   5.0);
-    upar.Add("BETA2",      10.520, 0.13150,   0.45,  0.58);
-    upar.Add("TM(+3)",      2.172, 0.11327,   1.0,   7.0);
-    upar.Add("TAU(-14)",    3.100, 0.90082,   0.1,  20.0);
-    upar.Add("COST1(-3)",   9.446, 2.00700,   0.1,  20.0);
-    upar.Add("T00",       258.300, 4.28760, 100.0, 400.0);
-
-    MnMigrad migrad(summCos, upar);
+    MnMigrad migrad(summCos, pParams->getParams());
     FunctionMinimum min = migrad();
     std::cout << "minimum: " << min << std::endl;
     summCos.Plot(min.UserParameters().Params());
+
 }
 
 
