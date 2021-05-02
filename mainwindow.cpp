@@ -14,16 +14,11 @@ using namespace Minuit2;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , pConsole(nullptr)
     , pUi(new Ui::MainWindow)
     , pOut(nullptr)
     , pParams(nullptr)
 {
     pUi->setupUi(this);
-    pConsole = new QTextEdit();
-    pConsole->document()->setMaximumBlockCount(10000);
-    pConsole->show();
-    //pOut = new QDebugStream(std::cout, pConsole);
     getSettings();
 }
 
@@ -31,7 +26,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow() {
     if(pUi) delete pUi;
     if(pOut) delete pOut;
-    if(pConsole) delete pConsole;
     if(pParams) delete pParams;
 }
 
@@ -44,8 +38,6 @@ MainWindow::closeEvent(QCloseEvent *event) {
     pUi = nullptr;
     if(pOut) delete pOut;
     pOut = nullptr;
-    if(pConsole) delete pConsole;
-    pConsole = nullptr;
     if(pParams) delete pParams;
     pParams = nullptr;
 }
@@ -76,9 +68,9 @@ MainWindow::on_SummCos_clicked() {
     pParams->Add("COST1(-3)",   9.446, 2.00700,   0.1,  20.00, false);
     pParams->Add("T00",       258.300, 4.28760, 100.0, 400.00, false);
 
-    setDisabled(true);
+    hide();
     pParams->exec();
     delete pParams;
-    setEnabled(true);
+    show();
 }
 

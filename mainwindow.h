@@ -29,7 +29,6 @@ protected:
 private:
 
 public:
-    QTextEdit* pConsole;
 
 private slots:
     void on_SummCos_clicked();

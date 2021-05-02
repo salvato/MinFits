@@ -5,6 +5,7 @@
 #include "math.h"
 #include <QDebug>
 #include <QFileDialog>
+#include <QApplication>
 
 //COMMON /BLOCCO1/ OMEGA, TAU, T1, BETA2, TM, BETA1, COST1, T00
 static double Tau, T1, Beta2, Tm, Beta1, Cost1, T00;
