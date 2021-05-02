@@ -32,6 +32,7 @@ public:
 
 private slots:
     void on_SummCos_clicked();
+    void onFitDone();
 
 private:
     Ui::MainWindow*   pUi;

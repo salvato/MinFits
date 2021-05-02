@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QObject>
-#include <QDialog>
+#include <QWidget>
 #include <QPushButton>
 
 #include "parameterline.h"
@@ -17,7 +17,7 @@ using namespace ROOT;
 using namespace Minuit2;
 
 
-class ParametersWindow : public QDialog
+class ParametersWindow : public QWidget
 {
     Q_OBJECT
 public:
@@ -36,6 +36,7 @@ protected:
 
 
 signals:
+    void closing();
 
 public slots:
     void onClose();

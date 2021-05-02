@@ -68,9 +68,17 @@ MainWindow::on_SummCos_clicked() {
     pParams->Add("COST1(-3)",   9.446, 2.00700,   0.1,  20.00, false);
     pParams->Add("T00",       258.300, 4.28760, 100.0, 400.00, false);
 
+    connect(pParams, SIGNAL(closing()),
+            this, SLOT(onFitDone()));
     hide();
-    pParams->exec();
+    pParams->show();
+}
+
+
+void
+MainWindow::onFitDone() {
     delete pParams;
+    pParams = nullptr;
     show();
 }
 

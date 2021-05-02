@@ -11,7 +11,7 @@
 
 
 ParametersWindow::ParametersWindow(QString title, QWidget *parent)
-    : QDialog(parent)
+    : QWidget(parent)
     , bInitialized(false)
     , pSummCos(nullptr)
 {
@@ -84,7 +84,7 @@ void
 ParametersWindow::onFit() {
     if(!bInitialized) {
         if(!pSummCos->readDataFile()) {
-            deleteLater();
+            return;
         }
         bInitialized = true;
     }
@@ -102,7 +102,7 @@ ParametersWindow::onFit() {
 
 void
 ParametersWindow::onClose() {
-    accept();
+    emit closing();
 }
 
 void
