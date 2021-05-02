@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>370</width>
-    <height>371</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>20</x>
       <y>50</y>
       <width>221</width>
-      <height>241</height>
+      <height>61</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
@@ -28,58 +28,9 @@
       <number>30</number>
      </property>
      <item>
-      <widget class="QRadioButton" name="Two_Gauss">
-       <property name="text">
-        <string>2 Gauss</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="Anarmonico">
-       <property name="text">
-        <string>Anarmonico</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="Debye">
-       <property name="text">
-        <string>CS Debye</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="RamanSchottky">
-       <property name="text">
-        <string>CS Raman + Schottky</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="Schottky">
-       <property name="text">
-        <string>Contributo Schottky</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QRadioButton" name="SummCos">
        <property name="text">
         <string>Summ + Cos (VFT)</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="TwoGauss_T">
-       <property name="text">
-        <string>2 Gauss - T</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="exp_T">
-       <property name="text">
-        <string>Exp - T</string>
        </property>
       </widget>
      </item>

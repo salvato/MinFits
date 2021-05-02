@@ -32,19 +32,14 @@ public:
     QTextEdit* pConsole;
 
 private slots:
-    void on_Two_Gauss_clicked();
-    void on_Anarmonico_clicked();
-    void on_Debye_clicked();
-    void on_RamanSchottky_clicked();
-    void on_Schottky_clicked();
     void on_SummCos_clicked();
-    void on_TwoGauss_T_clicked();
-    void on_exp_T_clicked();
 
 private:
-    Ui::MainWindow* ui;
-    QDebugStream*   pOut;
-    QString         sDataDir;
-    QSettings       settings;
+    Ui::MainWindow*   pUi;
+    QDebugStream*     pOut;
     ParametersWindow* pParams;
+
+private:
+    QString   sDataDir;
+    QSettings settings;
 };

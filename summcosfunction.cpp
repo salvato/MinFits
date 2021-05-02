@@ -164,8 +164,8 @@ SummCosFunction::Plot(const std::vector<double>& par) const
     if(pPlot) {
         pPlot->ClearDataSet(1);
         pPlot->ClearDataSet(2);
-        pPlot->NewDataSet(1, 1, QColor(255,0,0), Plot2D::iplus, "Exper.");
-        pPlot->NewDataSet(2, 1, QColor(255,255,0), Plot2D::iline, "Theory");
+        pPlot->NewDataSet(1, 1, QColor(255,  0,  0), Plot2D::iplus, "Exper.");
+        pPlot->NewDataSet(2, 1, QColor(255,255,  0), Plot2D::iline, "Theory");
         for(unsigned long i=0; i<theMeasurements.size(); i++) {
             pPlot->NewPoint(1, theTemperatures[i], theMeasurements[i]);
             pPlot->NewPoint(2, theTemperatures[i], theFit[i]);
@@ -205,7 +205,8 @@ summTerm(int n) {
 //             << "exp(term4)=" << exp(term4);
 
     double result = term2 * term3 * exp(term4);
-    assert(qIsFinite(result));
+    if(!qIsFinite(result))
+        result = __FLT_MAX__;
 
     // (-1)^(n-1) : n > 0
     if((n-1)/2*2 != (n-1))

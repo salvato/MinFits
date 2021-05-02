@@ -128,21 +128,22 @@ ParameterLine::SetStyles() {
 
 void
 ParameterLine::onNameChanged(QString sNewName) {
-    emit parametersChanged(number);
+    Q_UNUSED(sNewName)
+    emit nameChanged(number);
 }
 
 
 void
 ParameterLine::onInitialValueChanged(QString sNewInitialValue) {
     bool ok;
-    double dValue = sNewInitialValue.toDouble(&ok);
+    sNewInitialValue.toDouble(&ok);
     if(ok) {
         editInitialValue.setStyleSheet(sNormalStyle);
     }
     else {
         editInitialValue.setStyleSheet(sErrorStyle);
     }
-    emit parametersChanged(number);
+    emit valueChanged(number);
 }
 
 
@@ -150,14 +151,14 @@ ParameterLine::onInitialValueChanged(QString sNewInitialValue) {
 void
 ParameterLine::onErrorValueChanged(QString sNewErrorValue) {
     bool ok;
-    double dValue = sNewErrorValue.toDouble(&ok);
+    sNewErrorValue.toDouble(&ok);
     if(ok) {
         editErrorValue.setStyleSheet(sNormalStyle);
     }
     else {
         editErrorValue.setStyleSheet(sErrorStyle);
     }
-    emit parametersChanged(number);
+    emit errorChanged(number);
 }
 
 
@@ -165,14 +166,14 @@ ParameterLine::onErrorValueChanged(QString sNewErrorValue) {
 void
 ParameterLine::onMinValueChanged(QString sNewMinValue) {
     bool ok;
-    double dValue = sNewMinValue.toDouble(&ok);
+    sNewMinValue.toDouble(&ok);
     if(ok) {
         editMinValue.setStyleSheet(sNormalStyle);
     }
     else {
         editMinValue.setStyleSheet(sErrorStyle);
     }
-    emit parametersChanged(number);
+    emit minChanged(number);
 }
 
 
@@ -180,20 +181,21 @@ ParameterLine::onMinValueChanged(QString sNewMinValue) {
 void
 ParameterLine::onMaxValueChanged(QString sNewMaxValue) {
     bool ok;
-    double dValue = sNewMaxValue.toDouble(&ok);
+    sNewMaxValue.toDouble(&ok);
     if(ok) {
         editMaxValue.setStyleSheet(sNormalStyle);
     }
     else {
         editMaxValue.setStyleSheet(sErrorStyle);
     }
-    emit parametersChanged(number);
+    emit maxChanged(number);
 }
 
 
 void
 ParameterLine::onFixedstateChanged(int newState) {
-    emit parametersChanged(number);
+    Q_UNUSED(newState)
+    emit fixedstateChanged(number);
 }
 
 
@@ -208,3 +210,49 @@ ParameterLine::setErrorValue(double newValue) {
     editErrorValue.setText(QString("%1").arg(newValue));
 }
 
+
+void
+ParameterLine::setMinValue(double newValue) {
+    editMinValue.setText(QString("%1").arg(newValue));
+}
+
+
+void
+ParameterLine::setMaxValue(double newValue) {
+    editMaxValue.setText(QString("%1").arg(newValue));
+}
+
+
+QString
+ParameterLine::getName() {
+    return editName.text();
+}
+
+
+double
+ParameterLine::getInitialValue() {
+    return editInitialValue.text().toDouble();
+}
+
+
+double
+ParameterLine::getErrorValue() {
+    return editErrorValue.text().toDouble();
+}
+
+
+double
+ParameterLine::getMinValue() {
+    return editMinValue.text().toDouble();
+}
+
+
+double
+ParameterLine::getMaxValue() {
+    return editMaxValue.text().toDouble();
+}
+
+bool
+ParameterLine::isFixed() {
+    return checkFixed.isChecked();
+}

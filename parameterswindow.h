@@ -32,13 +32,24 @@ public:
              bool bFixed);
     MnUserParameters& getParams();
 
+protected:
+
+
 signals:
 
 public slots:
     void onClose();
     void onFit();
+    void onNameChanged(int paramNum);
+    void onValueChanged(int paramNum);
+    void onErrorChanged(int paramNum);
+    void onMinChanged(int paramNum);
+    void onMaxChanged(int paramNum);
+    void onFixedstateChanged(int paramNum);
+
 
 private:
+    bool bInitialized;
     int nParams;
     MnUserParameters upar;
     QVBoxLayout* pParamLayout;

@@ -5,7 +5,6 @@
 #include "Minuit2/MnUserParameters.h"
 #include "Minuit2/MnPrint.h"
 
-
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -13,6 +12,7 @@
 
 ParametersWindow::ParametersWindow(QString title, QWidget *parent)
     : QDialog(parent)
+    , bInitialized(false)
     , pSummCos(nullptr)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -56,8 +56,21 @@ ParametersWindow::Add(QString sName, double initVal, double error, double minVal
     parLine.push_back(new ParameterLine(nParams, sName, initVal, error, minVal, maxVal, bFixed));
     pParamLayout->addWidget(parLine.back());
     upar.Add(sName.toStdString(), initVal, error, minVal, maxVal);
+    nParams++;
     if(bFixed)
         upar.Fix(sName.toStdString());
+    connect(parLine.back(), SIGNAL(nameChanged(int)),
+            this, SLOT(onNameChanged(int)));
+    connect(parLine.back(), SIGNAL(valueChanged(int)),
+            this, SLOT(onValueChanged(int)));
+    connect(parLine.back(), SIGNAL(errorChanged(int)),
+            this, SLOT(onErrorChanged(int)));
+    connect(parLine.back(), SIGNAL(minChanged(int)),
+            this, SLOT(onMinChanged(int)));
+    connect(parLine.back(), SIGNAL(maxChanged(int)),
+            this, SLOT(onMaxChanged(int)));
+    connect(parLine.back(), SIGNAL(fixedstateChanged(int)),
+            this, SLOT(onFixedstateChanged(int)));
 }
 
 
@@ -69,8 +82,11 @@ ParametersWindow::getParams() {
 
 void
 ParametersWindow::onFit() {
-    if(!pSummCos->readDataFile()) {
-        return;
+    if(!bInitialized) {
+        if(!pSummCos->readDataFile()) {
+            deleteLater();
+        }
+        bInitialized = true;
     }
     MnMigrad migrad(*pSummCos, getParams());
     FunctionMinimum min = migrad();
@@ -81,8 +97,6 @@ ParametersWindow::onFit() {
         parLine.at(i)->setInitialValue(min.UserParameters().Value(i));
         parLine.at(i)->setErrorValue(min.UserParameters().Error(i));
     }
-    optimum.Fval();
-
 }
 
 
@@ -91,3 +105,40 @@ ParametersWindow::onClose() {
     accept();
 }
 
+void
+ParametersWindow::onNameChanged(int paramNum) {
+    upar.SetName(paramNum, parLine.at(paramNum)->getName().toStdString());
+}
+
+
+void
+ParametersWindow::onValueChanged(int paramNum) {
+    upar.SetValue(paramNum, parLine.at(paramNum)->getInitialValue());
+}
+
+
+void
+ParametersWindow::onErrorChanged(int paramNum) {
+    upar.SetError(paramNum, parLine.at(paramNum)->getErrorValue());
+}
+
+
+void
+ParametersWindow::onMinChanged(int paramNum) {
+    upar.SetLowerLimit(paramNum, parLine.at(paramNum)->getMinValue());
+}
+
+
+void
+ParametersWindow::onMaxChanged(int paramNum) {
+    upar.SetUpperLimit(paramNum, parLine.at(paramNum)->getMaxValue());
+}
+
+
+void
+ParametersWindow::onFixedstateChanged(int paramNum) {
+    if(parLine.at(paramNum)->isFixed())
+        upar.Fix(paramNum);
+    else
+        upar.Release(paramNum);
+}

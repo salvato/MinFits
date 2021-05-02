@@ -15,11 +15,11 @@ using namespace Minuit2;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , pConsole(nullptr)
-    , ui(new Ui::MainWindow)
+    , pUi(new Ui::MainWindow)
     , pOut(nullptr)
     , pParams(nullptr)
 {
-    ui->setupUi(this);
+    pUi->setupUi(this);
     pConsole = new QTextEdit();
     pConsole->document()->setMaximumBlockCount(10000);
     pConsole->show();
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 MainWindow::~MainWindow() {
-    if(ui) delete ui;
+    if(pUi) delete pUi;
     if(pOut) delete pOut;
     if(pConsole) delete pConsole;
     if(pParams) delete pParams;
@@ -40,8 +40,8 @@ void
 MainWindow::closeEvent(QCloseEvent *event) {
     Q_UNUSED(event)
     saveSettings();
-    if(ui) delete ui;
-    ui = nullptr;
+    if(pUi) delete pUi;
+    pUi = nullptr;
     if(pOut) delete pOut;
     pOut = nullptr;
     if(pConsole) delete pConsole;
@@ -82,85 +82,3 @@ MainWindow::on_SummCos_clicked() {
     setEnabled(true);
 }
 
-
-void
-MainWindow::on_Two_Gauss_clicked() {
-}
-
-
-void
-MainWindow::on_Anarmonico_clicked() {
-}
-
-
-void
-MainWindow::on_Debye_clicked() {
-}
-
-
-void
-MainWindow::on_RamanSchottky_clicked() {
-}
-
-
-void
-MainWindow::on_Schottky_clicked() {
-}
-
-
-void
-MainWindow::on_TwoGauss_T_clicked() {
-}
-
-
-void
-MainWindow::on_exp_T_clicked() {
-}
-
-/*
-bool
-MainWindow::readAlfaSFile() {
-    statusBar()->showMessage("Choose AlfaS Data File...", 0);
-    QFileDialog chooseFileDialog(nullptr,
-                                 "Open AlfaS Data File",
-                                 sDataDir,
-                                 "AlfaS Data files (*.dat *.txt)");
-    chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
-    if(!chooseFileDialog.exec())
-        return false;
-    statusBar()->clearMessage();
-
-    QString sFilename = chooseFileDialog.selectedFiles().at(0);
-    if(sFilename == QString())
-        return false;
-
-    QFile dataFile(sFilename);
-    if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        statusBar()->showMessage("Error Opening Data File", 3000);
-        return false;
-    }
-    QTextStream inFileStream(&dataFile);
-    try {
-        inFileStream >> nDati >> omega;
-        theAlfaS.empty();
-        theTemperatures.empty();
-        double t, alfaS;
-        while(!inFileStream.atEnd()) {
-            inFileStream >> t >> alfaS;
-            theTemperatures.push_back(t);
-            theAlfaS.push_back(alfaS);
-        }
-    } catch(...) {
-        statusBar()->showMessage("Error in Data File", 3000);
-        dataFile.close();
-        return false;
-    }
-
-    QString sSuccess = QString("Succesfully read %1 Data from %2")
-                       .arg(theAlfaS.size())
-                       .arg(sFilename);
-    statusBar()->showMessage(sSuccess, 3000);
-    dataFile.close();
-    return true;
-}
-*/

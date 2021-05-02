@@ -33,9 +33,22 @@ public:
 public:
     void setInitialValue(double newValue);
     void setErrorValue(double newValue);
+    void setMinValue(double newValue);
+    void setMaxValue(double newValue);
+
+    QString getName();
+    double getInitialValue();
+    double getErrorValue();
+    double getMinValue();
+    double getMaxValue();
+    bool   isFixed();
 
 signals:
-    void parametersChanged(int);
+    void nameChanged(int);
+    void valueChanged(int);
+    void errorChanged(int);
+    void minChanged(int);
+    void maxChanged(int);
     void fixedstateChanged(int);
 
 public slots:
