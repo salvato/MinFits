@@ -9,6 +9,12 @@
 ParametersWindow::ParametersWindow(QString title, QWidget *parent)
     : QWidget(parent)
 {
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
+    setWindowFlags(windowFlags() |  Qt::WindowMinMaxButtonsHint);
+    setMouseTracking(true);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     setWindowTitle(title);
     QVBoxLayout* pLayout = new QVBoxLayout();
     pLayout->addWidget(new ParameterLine());

@@ -13,6 +13,7 @@ ParameterLine::ParameterLine(int num,
     , number(num)
 {
     paramNumber.setText(QString("").arg(num));
+    paramNumber.setReadOnly(true);
     editName.setText(sName);
     editInitialValue.setText(sInitialValue);
     editErrorValue.setText(sErrorValue);
@@ -38,12 +39,14 @@ ParameterLine::ParameterLine(int num,
     , number(num)
 {
     paramNumber.setText(QString("%1").arg(num));
+    paramNumber.setReadOnly(true);
     editName.setText(sName);
     editInitialValue.setText(QString("%1").arg(initialValue));
     editErrorValue.setText(QString("%1").arg(errorValue));
     editMinValue.setText(QString("%1").arg(minValue));
     editMaxValue.setText(QString("%1").arg(maxValue));
     checkFixed.setChecked(bFixed);
+    checkFixed.setText("Fixed");
 
     SetLayout();
     ConnectSignals();
@@ -60,6 +63,14 @@ ParameterLine::ParameterLine() {
     editMaxValue.setText("Max");
     checkFixed.setChecked(false);
     checkFixed.setDisabled(true);
+    checkFixed.setText("Fixed");
+
+    paramNumber.setReadOnly(true);
+    editName.setReadOnly(true);
+    editInitialValue.setReadOnly(true);
+    editErrorValue.setReadOnly(true);
+    editMinValue.setReadOnly(true);
+    editMaxValue.setReadOnly(true);
 
     paramNumber.setAlignment( Qt::AlignCenter);
     editName.setAlignment( Qt::AlignCenter);
@@ -73,6 +84,7 @@ ParameterLine::ParameterLine() {
 
 void
 ParameterLine::SetLayout() {
+    checkFixed.setText("Fixed");
     auto* mainLayout = new QHBoxLayout();
     mainLayout->addWidget(&paramNumber);
     mainLayout->addWidget(&editName);
