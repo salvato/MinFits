@@ -13,9 +13,6 @@ namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
 
-QT_FORWARD_DECLARE_CLASS(Plot2D)
-
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -30,9 +27,6 @@ protected:
     void getSettings();
 
 private:
-    void deletePlots();
-    bool readAlfaSFile();
-    bool readSummCosFile();
 
 public:
     QTextEdit* pConsole;
@@ -50,16 +44,7 @@ private slots:
 private:
     Ui::MainWindow* ui;
     QDebugStream*   pOut;
-    Plot2D*         pPlotA;
-    Plot2D*         pPlotV;
     QString         sDataDir;
     QSettings       settings;
     ParametersWindow* pParams;
-
-    std::vector<double> theAlfaS;
-    std::vector<double> theTemperatures;
-    std::vector<double> theFit;
-
-    int nDati;
-    double omega, cost, t0;
 };

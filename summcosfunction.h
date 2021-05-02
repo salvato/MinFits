@@ -3,6 +3,7 @@
 #include "Minuit2/FCNBase.h"
 #include "qglobal.h"
 #include <vector>
+#include <QSettings>
 
 
 QT_FORWARD_DECLARE_CLASS(Plot2D)
@@ -15,28 +16,27 @@ namespace ROOT {
 
 class SummCosFunction : public FCNBase
 {
+
 public:
-    SummCosFunction(const std::vector<double>& tempertures,
-                    const std::vector<double>& measurements,
-                    std::vector<double>* fittedData,
-                    const double omega,
-                    const double cost,
-                    const double t0,
-                    Plot2D *pPlot);
+    SummCosFunction();
     ~SummCosFunction();
     double operator()(const std::vector<double>& par) const;
     double Up() const;
     void setErrorDef(double def);
     void Plot(const std::vector<double>& par) const;
+    bool readDataFile();
 
 protected:
+    void saveSettings();
+    void getSettings();
 
 private:
     std::vector<double> theMeasurements;
     std::vector<double> theTemperatures;
-    std::vector<double>* theFit;
     double theErrorDef;
-    Plot2D* pPlotA;
+    Plot2D*   pPlot;
+    QString   sDataDir;
+    QSettings settings;
 };
 
    }  // namespace Minuit2

@@ -30,9 +30,13 @@ public:
 
     explicit ParameterLine();
 
+public:
+    void setInitialValue(double newValue);
+    void setErrorValue(double newValue);
 
 signals:
     void parametersChanged(int);
+    void fixedstateChanged(int);
 
 public slots:
     void onNameChanged(QString sNewName);

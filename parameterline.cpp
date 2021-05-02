@@ -109,7 +109,7 @@ ParameterLine::ConnectSignals() {
             this, SLOT(onMinValueChanged(QString)));
     connect(&editMaxValue, SIGNAL(textChanged(QString)),
             this, SLOT(onMaxValueChanged(QString)));
-    connect(&checkFixed, SIGNAL(FixedstateChanged(int)),
+    connect(&checkFixed, SIGNAL(stateChanged(int)),
             this, SLOT(onFixedstateChanged(int)));
 }
 
@@ -194,5 +194,17 @@ ParameterLine::onMaxValueChanged(QString sNewMaxValue) {
 void
 ParameterLine::onFixedstateChanged(int newState) {
     emit parametersChanged(number);
+}
+
+
+void
+ParameterLine::setInitialValue(double newValue) {
+    editInitialValue.setText(QString("%1").arg(newValue));
+}
+
+
+void
+ParameterLine::setErrorValue(double newValue) {
+    editErrorValue.setText(QString("%1").arg(newValue));
 }
 

@@ -1,46 +1,37 @@
 #include "summcosfunction.h"
+#include "dceul.h"
+#include "gammln.h"
 #include "plot2d.h"
 #include "math.h"
 #include <QDebug>
-
+#include <QFileDialog>
 
 //COMMON /BLOCCO1/ OMEGA, TAU, T1, BETA2, TM, BETA1, COST1, T00
 static double Tau, T1, Beta2, Tm, Beta1, Cost1, T00;
 static double Omega, costk, t0k;
+std::vector<double> theFit;
 
 
-double gammln(double xx);
 double summTerm(int n);
-int dceul(double (*termine)(int),
-           double eps,
-           int iter,
-           int maxterm,
-           double* vk);
-
 
 using namespace ROOT;
 using namespace Minuit2;
 
 
-SummCosFunction::SummCosFunction(const std::vector<double>& temperatures,
-                                 const std::vector<double>& measurements,
-                                 std::vector<double>* fittedData,
-                                 const double omega,
-                                 const double cost,
-                                 const double t0,
-                                 Plot2D* pPlot)
-    : theMeasurements(measurements)
-    , theTemperatures(temperatures)
-    , theFit(fittedData)
-    , pPlotA(pPlot)
+SummCosFunction::SummCosFunction()
+    : pPlot(nullptr)
 {
-    Omega = omega;
-    costk = cost;
-    t0k = t0;
+    getSettings();
+
+    pPlot = new Plot2D(nullptr, "SummCos");
+    pPlot->SetLimits(0.0, 0.1, 0.0, 1.0, true, true, false, false);
+    pPlot->UpdatePlot();
+    pPlot->show();
 }
 
 
 SummCosFunction::~SummCosFunction() {
+    if(pPlot) delete pPlot;
 }
 
 
@@ -48,6 +39,74 @@ double
 SummCosFunction::Up() const
 {
     return 1.0;
+}
+
+
+void
+SummCosFunction::getSettings() {
+    sDataDir = settings.value("Data_Dir", QDir::currentPath()).toString();
+}
+
+
+void
+SummCosFunction::saveSettings() {
+    settings.setValue("Data_Dir", sDataDir);
+}
+
+
+bool
+SummCosFunction::readDataFile() {
+    //>>>statusBar()->showMessage("Choose SummCos Data File...", 0);
+    QFileDialog chooseFileDialog(nullptr,
+                                 "Open SUMM-COS Data File",
+                                 sDataDir,
+                                 "Summ Cos Data files (*.dat *.txt)");
+    chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
+    if(!chooseFileDialog.exec())
+        return false;
+    //>>>statusBar()->clearMessage();
+
+    QString sFilename = chooseFileDialog.selectedFiles().at(0);
+    if(sFilename == QString())
+        return false;
+
+    sDataDir = chooseFileDialog.directory().absolutePath();
+    settings.setValue("Data_Dir", sDataDir);
+    QFile dataFile(sFilename);
+    if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      //>>>statusBar()->showMessage("Error Opening Data File", 3000);
+      return false;
+    }
+    QTextStream inFileStream(&dataFile);
+    try {
+        theMeasurements.clear();
+        theTemperatures.clear();
+        theFit.clear();
+        double t, alfaS;
+        inFileStream >> Omega;
+        Omega *= 2.0*M_PI;
+        while(!inFileStream.atEnd()) {
+            inFileStream >> t >> alfaS;
+            theTemperatures.push_back(t);
+            theMeasurements.push_back(alfaS);
+            theFit.push_back(0.0);
+        }
+        dataFile.close();
+        costk = theMeasurements[0];
+        t0k   = theTemperatures[0];
+        saveSettings();
+    } catch(...) {
+        //>>>statusBar()->showMessage("Error in Data File", 3000);
+        dataFile.close();
+        return false;
+    }
+
+    QString sSuccess = QString("Succesfully read %1 Data from %2")
+                       .arg(theMeasurements.size())
+                       .arg(sFilename);
+    //>>>statusBar()->showMessage(sSuccess, 3000);
+    dataFile.close();
+    return true;
 }
 
 
@@ -73,8 +132,8 @@ SummCosFunction::operator()(const std::vector<double>& par) const
             qDebug() << "La Serie non converge";
             summa = __DBL_MAX__;
         }
-        theFit->at(j) =  costk - Cost1*(T1-t0k) - (Beta1*summa);
-        diff = theFit->at(j) - theMeasurements[j];
+        theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1*summa);
+        diff = theFit[j] - theMeasurements[j];
         f += (diff * diff);
     }
     return f;
@@ -99,54 +158,24 @@ SummCosFunction::Plot(const std::vector<double>& par) const
     for(unsigned long j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
         dceul(summTerm, eps, maxIter, maxterm, &summa);
-        theFit->at(j) =  costk - Cost1*(T1-t0k) - (Beta1*summa);
+        theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1*summa);
     }
 
-    if(pPlotA) {
-        pPlotA->ClearDataSet(1);
-        pPlotA->ClearDataSet(2);
-        pPlotA->NewDataSet(1, 1, QColor(255,0,0), Plot2D::iplus, "Exper.");
-        pPlotA->NewDataSet(2, 1, QColor(255,255,0), Plot2D::iline, "Theory");
+    if(pPlot) {
+        pPlot->ClearDataSet(1);
+        pPlot->ClearDataSet(2);
+        pPlot->NewDataSet(1, 1, QColor(255,0,0), Plot2D::iplus, "Exper.");
+        pPlot->NewDataSet(2, 1, QColor(255,255,0), Plot2D::iline, "Theory");
         for(unsigned long i=0; i<theMeasurements.size(); i++) {
-            pPlotA->NewPoint(1, theTemperatures[i], theMeasurements[i]);
-            pPlotA->NewPoint(2, theTemperatures[i], theFit->at(i));
+            pPlot->NewPoint(1, theTemperatures[i], theMeasurements[i]);
+            pPlot->NewPoint(2, theTemperatures[i], theFit[i]);
         }
-        pPlotA->SetShowTitle(1, true);
-        pPlotA->SetShowTitle(2, true);
-        pPlotA->SetShowDataSet(1, true);
-        pPlotA->SetShowDataSet(2, true);
-        pPlotA->UpdatePlot();
+        pPlot->SetShowTitle(1, true);
+        pPlot->SetShowTitle(2, true);
+        pPlot->SetShowDataSet(1, true);
+        pPlot->SetShowDataSet(2, true);
+        pPlot->UpdatePlot();
     }
-}
-
-
-// Calcola una sommatoria infinita troncandola
-// quando non ha senso calcolare ulteriori termini
-// restituisce un valore diverso da 0 in caso di errore
-int
-dceul(double (*termine)(int),
-      double eps,
-      int iter,
-      int maxterm,
-      double* vk)
-{
-    *vk  = 0.0;
-    double vk1;
-    for(int j=0; j<iter; j++) {
-        int k = j * maxterm;
-        for(int i=k+1; i<=k+maxterm; i++) {
-            vk1 = *vk + termine(i);
-            if(*vk == vk1)
-                return 0; // Sum converged !
-            double perc = abs(vk1-*vk)/abs(vk1);
-            if(perc < eps) { // Sum almost converged !
-                *vk = vk1;
-                return 0;
-            }
-            *vk = vk1;
-        }
-    }
-    return -maxterm;// Sum does not converge !
 }
 
 
@@ -186,21 +215,3 @@ summTerm(int n) {
 
 }
 
-
-// gammln() i.e. ln(gamma(xx)) as implemented in
-// the second edition of "Numerical Recipes in C"
-double
-gammln(double xx) {
-    double x, y, tmp, ser;
-    static double coef[6]={76.18009172947146,     -86.50532032941677,
-                           24.01409824083091,     -1.231739572450155,
-                           0.1208650973866179e-2, -0.5395239384953e-5};
-
-    y    = x = xx;
-    tmp  = x + 5.5;
-    tmp -= (x+0.5)*log(tmp);
-    ser  = 1.000000000190015;
-    for(int j=0; j<6; j++)
-        ser += coef[j]/++y;
-    return -tmp+log(2.5066282746310005*ser/x);
-}

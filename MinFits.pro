@@ -17,6 +17,8 @@ SOURCES += \
     DataSetProperties.cpp \
     axesdialog.cpp \
     datastream2d.cpp \
+    dceul.cpp \
+    gammln.cpp \
     main.cpp \
     mainwindow.cpp \
     parameterline.cpp \
@@ -33,6 +35,8 @@ HEADERS += \
     DataSetProperties.h \
     axesdialog.h \
     datastream2d.h \
+    dceul.h \
+    gammln.h \
     mainwindow.h \
     parameterline.h \
     parameterswindow.h \
