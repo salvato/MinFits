@@ -1,3 +1,21 @@
+/*
+ *
+Copyright (C) 2021  Gabriele Salvato
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
 #include "summcosfunction.h"
 #include "dceul.h"
 #include "gammln.h"
@@ -176,6 +194,24 @@ SummCosFunction::Plot(const std::vector<double>& par) const
         pPlot->SetShowDataSet(2, true);
         pPlot->UpdatePlot();
     }
+}
+
+
+bool
+SummCosFunction::saveData(QFile* pOutFile) {
+    pOutFile->write(QString("%1 %2 %3\n")
+                    .arg("Temperature", 12)
+                    .arg("Measurements", 12)
+                    .arg("Fit", 12)
+                    .toLocal8Bit());
+    for(ulong i=0; i<theMeasurements.size(); i++) {
+        pOutFile->write(QString("%1 %2 %3\n")
+                        .arg(theTemperatures[i], 12, 'g', 6, ' ')
+                        .arg(theMeasurements[i], 12, 'g', 6, ' ')
+                        .arg(theFit[i], 12, 'g', 6, ' ')
+                        .toLocal8Bit());
+    }
+    return true;
 }
 
 
