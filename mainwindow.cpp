@@ -8,6 +8,7 @@
 #include <QFile>
 #include <math.h>
 
+std::vector<double> theFit;
 
 using namespace ROOT;
 using namespace Minuit2;
@@ -15,17 +16,16 @@ using namespace Minuit2;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , pConsole(nullptr)
     , pUi(new Ui::MainWindow)
     , pOut(nullptr)
     , pParams(nullptr)
+    , pMsgWindow(nullptr)
 {
     pUi->setupUi(this);
     getSettings();
-    pConsole = new QTextEdit();
-    pConsole->document()->setMaximumBlockCount(10000);
-    pConsole->show();
-    pOut = new QDebugStream(std::cout, pConsole);
+    pMsgWindow = new MsgWindow();
+    pMsgWindow->show();
+    pOut = new QDebugStream(std::cout, &pMsgWindow->textEdit);
 }
 
 
@@ -33,7 +33,7 @@ MainWindow::~MainWindow() {
     if(pUi) delete pUi;
     if(pOut) delete pOut;
     if(pParams) delete pParams;
-    if(pConsole) delete pConsole;
+    if(pMsgWindow) delete pMsgWindow;
 }
 
 
@@ -47,8 +47,8 @@ MainWindow::closeEvent(QCloseEvent *event) {
     pOut = nullptr;
     if(pParams) delete pParams;
     pParams = nullptr;
-    if(pConsole) delete pConsole;
-    pConsole = nullptr;
+    if(pMsgWindow) delete pMsgWindow;
+    pMsgWindow = nullptr;
 }
 
 
@@ -68,7 +68,8 @@ MainWindow::saveSettings() {
 
 void
 MainWindow::on_SummCos_clicked() {
-    pParams = new ParametersWindow("Fit Parameters", nullptr);
+    if(pParams) delete pParams;
+    pParams = new ParametersWindow("Summ + Cos Fit Parameters", nullptr);
 
     pParams->Add("BETA1",       1.108, 0.20880,   0.2,   5.00, false);
     pParams->Add("BETA2",      10.520, 0.13150,   0.45,  0.58, false);
@@ -89,5 +90,27 @@ MainWindow::onFitDone() {
     delete pParams;
     pParams = nullptr;
     show();
+/*
+    if(pParams->getParams().)
+    settings.setValue(QString("MainWindow_Dialog"), saveGeometry());
+    settings.setValue("Data_Dir", sDataDir);
+*/
 }
 
+
+void
+MainWindow::on_SummSin_clicked() {
+    if(pParams) delete pParams;
+    pParams = new ParametersWindow("Summ + Sin Fit Parameters", nullptr);
+
+    pParams->Add("BETA1",       0.250, 0.20880,   0.2,   5.00, false);
+    pParams->Add("BETA2",       0.290, 0.13150,   0.1,   0.58, false);
+    pParams->Add("TM(+3)",      2.020, 0.11327,   1.0,   7.00, false);
+    pParams->Add("TAU(-14)",    3.680, 0.90082,   0.1,  20.00, false);
+    pParams->Add("T00",       119.000, 4.28760, 100.0, 400.00, false);
+
+    connect(pParams, SIGNAL(closing()),
+            this, SLOT(onFitDone()));
+    hide();
+    pParams->show();
+}

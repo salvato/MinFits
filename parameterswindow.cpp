@@ -14,7 +14,7 @@
 ParametersWindow::ParametersWindow(QString title, QWidget *parent)
     : QWidget(parent)
     , bInitialized(false)
-    , pSummCos(nullptr)
+    , pSummSin(nullptr)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
@@ -43,34 +43,35 @@ ParametersWindow::ParametersWindow(QString title, QWidget *parent)
     setLayout(pGeneralLayout);
 
     nParams = 0;
-    pSummCos = new SummCosFunction();
+    pSummSin = new SummSinFunction();
 }
 
 
 ParametersWindow::~ParametersWindow() {
-    if(pSummCos) delete pSummCos;
+    if(pSummSin) delete pSummSin;
 }
 
 
 void
 ParametersWindow::Add(QString sName, double initVal, double error, double minVal, double maxVal, bool bFixed) {
-    parLine.push_back(new ParameterLine(nParams, sName, initVal, error, minVal, maxVal, bFixed));
+    ParameterLine* newPar = new ParameterLine(nParams, sName, initVal, error, minVal, maxVal, bFixed);
+    parLine.push_back(newPar);
     pParamLayout->addWidget(parLine.back());
     upar.Add(sName.toStdString(), initVal, error, minVal, maxVal);
     nParams++;
     if(bFixed)
         upar.Fix(sName.toStdString());
-    connect(parLine.back(), SIGNAL(nameChanged(int)),
+    connect(newPar, SIGNAL(nameChanged(int)),
             this, SLOT(onNameChanged(int)));
-    connect(parLine.back(), SIGNAL(valueChanged(int)),
+    connect(newPar, SIGNAL(valueChanged(int)),
             this, SLOT(onValueChanged(int)));
-    connect(parLine.back(), SIGNAL(errorChanged(int)),
+    connect(newPar, SIGNAL(errorChanged(int)),
             this, SLOT(onErrorChanged(int)));
-    connect(parLine.back(), SIGNAL(minChanged(int)),
+    connect(newPar, SIGNAL(minChanged(int)),
             this, SLOT(onMinChanged(int)));
-    connect(parLine.back(), SIGNAL(maxChanged(int)),
+    connect(newPar, SIGNAL(maxChanged(int)),
             this, SLOT(onMaxChanged(int)));
-    connect(parLine.back(), SIGNAL(fixedstateChanged(int)),
+    connect(newPar, SIGNAL(fixedstateChanged(int)),
             this, SLOT(onFixedstateChanged(int)));
 }
 
@@ -84,16 +85,16 @@ ParametersWindow::getParams() {
 void
 ParametersWindow::onFit() {
     if(!bInitialized) {
-        if(!pSummCos->readDataFile())
+        if(!pSummSin->readDataFile())
             return;
     }
     QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
     setDisabled(true);
     bInitialized = true;
-    MnMigrad migrad(*pSummCos, getParams());
+    MnMigrad migrad(*pSummSin, getParams());
     FunctionMinimum min = migrad();
     std::cout << "minimum: " << min << std::endl;
-    pSummCos->Plot(min.UserParameters().Params());
+    pSummSin->Plot(min.UserParameters().Params());
     MnUserParameterState optimum = min.UserState();
     if(qIsFinite(optimum.Edm())) {
         for(unsigned int i=0; i<optimum.Params().size(); i++) {
@@ -120,6 +121,7 @@ ParametersWindow::onNameChanged(int paramNum) {
 void
 ParametersWindow::onValueChanged(int paramNum) {
     upar.SetValue(paramNum, parLine.at(paramNum)->getInitialValue());
+    pSummSin->Plot(upar.Params());
 }
 
 

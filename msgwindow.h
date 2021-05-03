@@ -1,9 +1,9 @@
-#ifndef MSGWINDOW_H
-#define MSGWINDOW_H
+#pragma once
 
 #include <QObject>
 #include <QWidget>
 #include <QTextEdit>
+#include <QVBoxLayout>
 
 class MsgWindow : public QWidget
 {
@@ -13,8 +13,9 @@ public:
 
 signals:
 
-private:
+public:
     QTextEdit textEdit;
-};
 
-#endif // MSGWINDOW_H
+private:
+    QVBoxLayout* pGeneralLayout;
+};

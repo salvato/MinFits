@@ -1,6 +1,7 @@
 #include "qdebugstream.h"
 #include <iostream>
 
+
 using namespace std;
 
 
@@ -9,14 +10,14 @@ QDebugStream::QDebugStream(std::ostream &stream, QTextEdit *text_edit)
     : std::basic_streambuf<char>()
     , m_stream(stream)
 {
-    this->log_window = text_edit;
-    this->m_old_buf = stream.rdbuf();
+    log_window = text_edit;
+    m_old_buf = stream.rdbuf();
     stream.rdbuf(this);
 }
 
 
 QDebugStream::~QDebugStream() {
-    this->m_stream.rdbuf(this->m_old_buf);
+    m_stream.rdbuf(m_old_buf);
 }
 
 
@@ -31,7 +32,7 @@ QDebugStream::myConsoleMessageHandler(QtMsgType type,
                                       const QMessageLogContext&,
                                       const QString& msg)
 {
-    QByteArray localMsg = msg.toLocal8Bit();
+    //QByteArray localMsg = msg.toLocal8Bit();
     switch (type) {
        case QtDebugMsg:
           // fprintf(stderr, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
@@ -54,9 +55,15 @@ QDebugStream::myConsoleMessageHandler(QtMsgType type,
        }
 }
 
+
 std::streamsize
 QDebugStream::xsputn(const char *p, std::streamsize n) {
     QByteArray localMsg(p, n);
-    log_window->append(localMsg);
+    log_window->insertPlainText(QString(localMsg));
+//    int m = strlen(p) - ulong(n);
+//    if(m) {
+//        for(int i=0; i<m; i++)
+//            log_window->insertPlainText(QString(*(p+n+i)));
+//    }
     return n;
 }

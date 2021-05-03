@@ -5,7 +5,8 @@
 #include <QPushButton>
 
 #include "parameterline.h"
-#include "summcosfunction.h"
+//#include "summcosfunction.h"
+#include "summsinfunction.h"
 #include "Minuit2/MnUserParameters.h"
 
 
@@ -58,6 +59,7 @@ private:
     QVBoxLayout* pGeneralLayout;
     QPushButton buttonFit;
     QPushButton buttonClose;
-    SummCosFunction* pSummCos;
+    //SummCosFunction* pSummCos;
+    SummSinFunction* pSummSin;
     std::vector<ParameterLine*> parLine;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QTextEdit>
+#include <streambuf>
 
 using namespace std;
 
@@ -14,13 +15,15 @@ public:
     static void registerMyConsoleMessageHandler();
 
 private:
-    static void myConsoleMessageHandler(QtMsgType type, const QMessageLogContext &, const QString &msg);
+    static void myConsoleMessageHandler(QtMsgType type,
+                                        const QMessageLogContext&,
+                                        const QString& msg);
 
 protected:
-    virtual int_type overflow(int_type v) {
-            if(v == '\n') {
+    virtual int
+        overflow(int v) {
+            if(v == '\n')
                 log_window->append("");
-            }
             return v;
         }
     virtual std::streamsize xsputn(const char *p, std::streamsize n);

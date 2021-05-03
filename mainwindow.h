@@ -6,6 +6,7 @@
 
 #include "qdebugstream.h"
 #include "parameterswindow.h"
+#include "msgwindow.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -32,13 +33,16 @@ private slots:
     void on_SummCos_clicked();
     void onFitDone();
 
+    void on_SummSin_clicked();
+
 public:
-    QTextEdit* pConsole;
+
 
 private:
     Ui::MainWindow*   pUi;
     QDebugStream*     pOut;
     ParametersWindow* pParams;
+    MsgWindow*        pMsgWindow;
 
 private:
     QString   sDataDir;

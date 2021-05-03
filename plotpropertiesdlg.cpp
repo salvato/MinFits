@@ -139,10 +139,10 @@ plotPropertiesDlg::connectSignals() {
     connect(&labelFontButton, SIGNAL(clicked()),
             this, SLOT(onChangeLabelsFont()));
     // Line Edit
-    connect(&gridPenWidthEdit, SIGNAL(textChanged(const QString)),
-            this, SLOT(onChangeGridPenWidth(const QString)));
-    connect(&maxDataPointsEdit, SIGNAL(textChanged(const QString)),
-            this, SLOT(onChangeMaxDataPoints(const QString)));
+    connect(&gridPenWidthEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(onChangeGridPenWidth(QString)));
+    connect(&maxDataPointsEdit, SIGNAL(textChanged(QString)),
+            this, SLOT(onChangeMaxDataPoints(QString)));
     // Button Box
     connect(pButtonBox, SIGNAL(accepted()),
             this, SLOT(onOk()));

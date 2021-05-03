@@ -30,3 +30,28 @@ dceul(double (*termine)(int),
     return -maxterm;// Sum does not converge !
 }
 
+
+// From "Numerical Recipes"
+//void
+//eulsum(double *sum, double term, int jterm, double wksp[]) {
+//    static int nterm;
+//    double tmp, dum;
+
+//    if (jterm == 1) {
+//        nterm=1;
+//        *sum=0.5*(wksp[1]=term);
+//    } else {
+//        tmp = wksp[1];
+//        wksp[1] = term;
+//        for(int j=1; j<=nterm-1; j++) {
+//            dum = wksp[j+1];
+//            wksp[j+1] = 0.5*(wksp[j]+tmp);
+//            tmp = dum;
+//        }
+//        wksp[nterm+1] = 0.5*(wksp[nterm]+tmp);
+//        if (abs(wksp[nterm+1]) <= abs(wksp[nterm]))
+//            *sum += (0.5*wksp[++nterm]);
+//        else
+//            *sum += wksp[nterm+1];
+//    }
+//}
