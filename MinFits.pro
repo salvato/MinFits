@@ -66,12 +66,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     .gitignore \
-    DatiTest/PVB-1Hz alfa param.cmd \
-    DatiTest/PVB-1Hz alfa param.cmd \
-    DatiTest/PVB-1Hz alfa param.cmd \
-    DatiTest/PVB-1Hz_alfa_param.cmd \
-    DatiTest/PVB50_1Hz absorption.dat \
-    DatiTest/PVB50_1Hz absorption.dat \
+    DatiTest/PVB50_1Hz_absorption.dat \
     DatiTest/PVB_1Hz.dat \
     plot.png
 
