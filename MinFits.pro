@@ -70,4 +70,10 @@ DISTFILES += \
     DatiTest/PVB-1Hz alfa param.cmd \
     DatiTest/PVB-1Hz alfa param.cmd \
     DatiTest/PVB-1Hz_alfa_param.cmd \
-    DatiTest/PVB_1Hz.dat
+    DatiTest/PVB50_1Hz absorption.dat \
+    DatiTest/PVB50_1Hz absorption.dat \
+    DatiTest/PVB_1Hz.dat \
+    plot.png
+
+RESOURCES += \
+    Resources.qrc
