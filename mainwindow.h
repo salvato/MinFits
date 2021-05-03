@@ -7,6 +7,7 @@
 #include "qdebugstream.h"
 #include "parameterswindow.h"
 #include "msgwindow.h"
+#include "MinimizationFunction.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -43,6 +44,7 @@ private:
     QDebugStream*     pOut;
     ParametersWindow* pParams;
     MsgWindow*        pMsgWindow;
+    MinimizationFunction* pFunctionToMinimize;
 
 private:
     QString   sDataDir;

@@ -6,7 +6,7 @@
 
 #include "parameterline.h"
 //#include "summcosfunction.h"
-#include "summsinfunction.h"
+#include "MinimizationFunction.h"
 #include "Minuit2/MnUserParameters.h"
 
 
@@ -22,7 +22,9 @@ class ParametersWindow : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ParametersWindow(QString title="Fit Parameters", QWidget *parent = nullptr);
+    explicit ParametersWindow(MinimizationFunction* pMyFunction,
+                              QString title="Fit Parameters",
+                              QWidget *parent = nullptr);
     ~ParametersWindow();
 public:
     void Add(QString sName,
@@ -41,6 +43,7 @@ signals:
 
 public slots:
     void onClose();
+    void onLoadData();
     void onFit();
     void onNameChanged(int paramNum);
     void onValueChanged(int paramNum);
@@ -51,7 +54,6 @@ public slots:
 
 
 private:
-    bool bInitialized;
     int nParams;
     MnUserParameters upar;
     QVBoxLayout* pParamLayout;
@@ -59,7 +61,7 @@ private:
     QVBoxLayout* pGeneralLayout;
     QPushButton buttonFit;
     QPushButton buttonClose;
-    //SummCosFunction* pSummCos;
-    SummSinFunction* pSummSin;
+    QPushButton buttonLoadData;
+    MinimizationFunction* pFunction;
     std::vector<ParameterLine*> parLine;
 };

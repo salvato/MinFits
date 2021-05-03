@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QApplication>
+#include <iostream>
 
 
 static double Tau, T1, Beta2, Tm, Beta1, Cost1, T00;
@@ -44,6 +45,12 @@ SummCosFunction::Up() const
 
 
 void
+SummCosFunction::SetErrorDef(double def) {
+    theErrorDef = def;
+}
+
+
+void
 SummCosFunction::getSettings() {
     sDataDir = settings.value("Data_Dir", QDir::currentPath()).toString();
 }
@@ -57,7 +64,6 @@ SummCosFunction::saveSettings() {
 
 bool
 SummCosFunction::readDataFile() {
-    //>>>statusBar()->showMessage("Choose SummCos Data File...", 0);
     QFileDialog chooseFileDialog(nullptr,
                                  "Open SUMM-COS Data File",
                                  sDataDir,
@@ -65,7 +71,6 @@ SummCosFunction::readDataFile() {
     chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
     if(!chooseFileDialog.exec())
         return false;
-    //>>>statusBar()->clearMessage();
 
     QString sFilename = chooseFileDialog.selectedFiles().at(0);
     if(sFilename == QString())
@@ -75,7 +80,6 @@ SummCosFunction::readDataFile() {
     settings.setValue("Data_Dir", sDataDir);
     QFile dataFile(sFilename);
     if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      //>>>statusBar()->showMessage("Error Opening Data File", 3000);
       return false;
     }
     QTextStream inFileStream(&dataFile);
@@ -97,15 +101,10 @@ SummCosFunction::readDataFile() {
         t0k   = theTemperatures[0];
         saveSettings();
     } catch(...) {
-        //>>>statusBar()->showMessage("Error in Data File", 3000);
         dataFile.close();
         return false;
     }
 
-//    QString sSuccess = QString("Succesfully read %1 Data from %2")
-//                       .arg(theMeasurements.size())
-//                       .arg(sFilename);
-    //>>>statusBar()->showMessage(sSuccess, 3000);
     dataFile.close();
     return true;
 }
@@ -130,7 +129,7 @@ SummCosFunction::operator()(const std::vector<double>& par) const
     for(unsigned long j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
         if(dceul(summCosTerm, Eps, Iter, Maxterm, &summa)) {
-            qDebug() << "La Serie non converge";
+            //std::cout << "La Serie non converge";
             summa = __DBL_MAX__;
         }
         theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1*summa);

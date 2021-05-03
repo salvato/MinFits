@@ -47,6 +47,13 @@ SummSinFunction::Up() const
 
 
 void
+SummSinFunction::SetErrorDef(double def) {
+    theErrorDef = def;
+}
+
+
+
+void
 SummSinFunction::getSettings() {
     sDataDir = settings.value("Data_Dir", QDir::currentPath()).toString();
 }
@@ -123,7 +130,7 @@ SummSinFunction::operator()(const std::vector<double>& par) const
     for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
         if(dceul(summTerm, Eps, Iter, Maxterm, &summa)) {
-            std::cout << "La Serie non converge";
+            //std::cout << "La Serie non converge\n";
             summa = __DBL_MAX__;
         }
         theFit[j] =  Beta1*summa;

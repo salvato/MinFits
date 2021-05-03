@@ -11,10 +11,11 @@
 #include <QLabel>
 
 
-ParametersWindow::ParametersWindow(QString title, QWidget *parent)
+ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
+                                   QString title,
+                                   QWidget *parent)
     : QWidget(parent)
-    , bInitialized(false)
-    , pSummSin(nullptr)
+    , pFunction(pMyFunction)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
@@ -24,9 +25,13 @@ ParametersWindow::ParametersWindow(QString title, QWidget *parent)
 
     setWindowTitle(title);
     buttonClose.setText("Close");
+    buttonLoadData.setText("Load Data");
     buttonFit.setText("Start Fit");
+    buttonFit.setEnabled(false);
     connect(&buttonClose, SIGNAL(clicked()),
             this, SLOT(onClose()));
+    connect(&buttonLoadData, SIGNAL(clicked()),
+            this, SLOT(onLoadData()));
     connect(&buttonFit, SIGNAL(clicked()),
             this, SLOT(onFit()));
 
@@ -35,6 +40,7 @@ ParametersWindow::ParametersWindow(QString title, QWidget *parent)
 
     pButtonLayout = new QHBoxLayout();
     pButtonLayout->addWidget(&buttonClose);
+    pButtonLayout->addWidget(&buttonLoadData);
     pButtonLayout->addWidget(&buttonFit);
 
     pGeneralLayout = new QVBoxLayout();
@@ -43,12 +49,10 @@ ParametersWindow::ParametersWindow(QString title, QWidget *parent)
     setLayout(pGeneralLayout);
 
     nParams = 0;
-    pSummSin = new SummSinFunction();
 }
 
 
 ParametersWindow::~ParametersWindow() {
-    if(pSummSin) delete pSummSin;
 }
 
 
@@ -83,18 +87,22 @@ ParametersWindow::getParams() {
 
 
 void
+ParametersWindow::onLoadData() {
+    if(!pFunction->readDataFile())
+        return;
+    pFunction->Plot(upar.Params());
+    buttonFit.setEnabled(true);
+}
+
+
+void
 ParametersWindow::onFit() {
-    if(!bInitialized) {
-        if(!pSummSin->readDataFile())
-            return;
-    }
     QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
     setDisabled(true);
-    bInitialized = true;
-    MnMigrad migrad(*pSummSin, getParams());
+    MnMigrad migrad(*pFunction, getParams());
     FunctionMinimum min = migrad();
     std::cout << "minimum: " << min << std::endl;
-    pSummSin->Plot(min.UserParameters().Params());
+    pFunction->Plot(min.UserParameters().Params());
     MnUserParameterState optimum = min.UserState();
     if(qIsFinite(optimum.Edm())) {
         for(unsigned int i=0; i<optimum.Params().size(); i++) {
@@ -121,7 +129,7 @@ ParametersWindow::onNameChanged(int paramNum) {
 void
 ParametersWindow::onValueChanged(int paramNum) {
     upar.SetValue(paramNum, parLine.at(paramNum)->getInitialValue());
-    pSummSin->Plot(upar.Params());
+    pFunction->Plot(upar.Params());
 }
 
 

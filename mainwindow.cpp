@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "summcosfunction.h"
+#include "summsinfunction.h"
 
 #include <iostream>
 #include <fstream>
@@ -20,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , pOut(nullptr)
     , pParams(nullptr)
     , pMsgWindow(nullptr)
+    , pFunctionToMinimize(nullptr)
 {
     pUi->setupUi(this);
     getSettings();
@@ -34,6 +37,7 @@ MainWindow::~MainWindow() {
     if(pOut) delete pOut;
     if(pParams) delete pParams;
     if(pMsgWindow) delete pMsgWindow;
+    if(pFunctionToMinimize) delete pFunctionToMinimize;
 }
 
 
@@ -49,6 +53,7 @@ MainWindow::closeEvent(QCloseEvent *event) {
     pParams = nullptr;
     if(pMsgWindow) delete pMsgWindow;
     pMsgWindow = nullptr;
+    if(pFunctionToMinimize) delete pFunctionToMinimize;
 }
 
 
@@ -69,7 +74,9 @@ MainWindow::saveSettings() {
 void
 MainWindow::on_SummCos_clicked() {
     if(pParams) delete pParams;
-    pParams = new ParametersWindow("Summ + Cos Fit Parameters", nullptr);
+    if(pFunctionToMinimize) delete pFunctionToMinimize;
+    pFunctionToMinimize = new SummCosFunction();
+    pParams = new ParametersWindow(pFunctionToMinimize, "Summ + Cos Fit Parameters", nullptr);
 
     pParams->Add("BETA1",       1.108, 0.20880,   0.2,   5.00, false);
     pParams->Add("BETA2",      10.520, 0.13150,   0.45,  0.58, false);
@@ -101,7 +108,9 @@ MainWindow::onFitDone() {
 void
 MainWindow::on_SummSin_clicked() {
     if(pParams) delete pParams;
-    pParams = new ParametersWindow("Summ + Sin Fit Parameters", nullptr);
+    if(pFunctionToMinimize) delete pFunctionToMinimize;
+    pFunctionToMinimize = new SummSinFunction();
+    pParams = new ParametersWindow(pFunctionToMinimize, "Summ + Sin Fit Parameters", nullptr);
 
     pParams->Add("BETA1",       0.250, 0.20880,   0.2,   5.00, false);
     pParams->Add("BETA2",       0.290, 0.13150,   0.1,   0.58, false);

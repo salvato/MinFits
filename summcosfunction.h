@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Minuit2/FCNBase.h"
+#include "MinimizationFunction.h"
 #include "qglobal.h"
 #include <vector>
 #include <QSettings>
@@ -14,7 +14,7 @@ namespace ROOT {
    namespace Minuit2 {
 
 
-class SummCosFunction : public FCNBase
+class SummCosFunction : public MinimizationFunction
 {
 
 public:
@@ -22,12 +22,12 @@ public:
     ~SummCosFunction();
     double operator()(const std::vector<double>& par) const;
     double Up() const;
-    void setErrorDef(double def);
+    void SetErrorDef(double def);
     void Plot(const std::vector<double>& par) const;
     bool readDataFile();
+    void saveSettings();
 
 protected:
-    void saveSettings();
     void getSettings();
 
 private:

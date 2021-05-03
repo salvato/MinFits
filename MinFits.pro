@@ -35,6 +35,7 @@ HEADERS += \
     AxisFrame.h \
     AxisLimits.h \
     DataSetProperties.h \
+    MinimizationFunction.h \
     axesdialog.h \
     datastream2d.h \
     dceul.h \
