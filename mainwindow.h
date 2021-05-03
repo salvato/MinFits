@@ -28,22 +28,16 @@ protected:
     void saveSettings();
     void getSettings();
 
-private:
-
 private slots:
     void on_SummCos_clicked();
     void onFitDone();
-
     void on_SummSin_clicked();
 
-public:
-
-
 private:
-    Ui::MainWindow*   pUi;
-    QDebugStream*     pOut;
-    ParametersWindow* pParams;
-    MsgWindow*        pMsgWindow;
+    Ui::MainWindow*       pUi;
+    QDebugStream*         pOut;
+    ParametersWindow*     pParams;
+    MsgWindow*            pMsgWindow;
     MinimizationFunction* pFunctionToMinimize;
 
 private:

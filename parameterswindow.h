@@ -44,6 +44,7 @@ signals:
 public slots:
     void onClose();
     void onLoadData();
+    void onSaveData();
     void onFit();
     void onNameChanged(int paramNum);
     void onValueChanged(int paramNum);
@@ -62,6 +63,7 @@ private:
     QPushButton buttonFit;
     QPushButton buttonClose;
     QPushButton buttonLoadData;
+    QPushButton buttonSaveData;
     MinimizationFunction* pFunction;
     std::vector<ParameterLine*> parLine;
 };

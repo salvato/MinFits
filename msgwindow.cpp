@@ -15,4 +15,24 @@ MsgWindow::MsgWindow(QWidget *parent)
 
     textEdit.setFontFamily("Courier");
     textEdit.document()->setMaximumBlockCount(10000);
+
+    getSettings();
 }
+
+
+MsgWindow::~MsgWindow() {
+    saveSettings();
+}
+
+
+void
+MsgWindow::getSettings() {
+    restoreGeometry(settings.value(QString("MsgWindow")).toByteArray());
+}
+
+
+void
+MsgWindow::saveSettings() {
+    settings.setValue(QString("MsgWindow"), saveGeometry());
+}
+

@@ -22,18 +22,23 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
     setWindowFlags(windowFlags() |  Qt::WindowMinMaxButtonsHint);
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     setWindowTitle(title);
+
     buttonClose.setText("Close");
     buttonLoadData.setText("Load Data");
     buttonFit.setText("Start Fit");
+    buttonSaveData.setText("Save Fit");
     buttonFit.setEnabled(false);
+    buttonSaveData.setEnabled(false);
+
     connect(&buttonClose, SIGNAL(clicked()),
             this, SLOT(onClose()));
     connect(&buttonLoadData, SIGNAL(clicked()),
             this, SLOT(onLoadData()));
     connect(&buttonFit, SIGNAL(clicked()),
             this, SLOT(onFit()));
+    connect(&buttonSaveData, SIGNAL(clicked()),
+            this, SLOT(onSaveData()));
 
     pParamLayout = new QVBoxLayout();
     pParamLayout->addWidget(new ParameterLine());
@@ -42,6 +47,7 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
     pButtonLayout->addWidget(&buttonClose);
     pButtonLayout->addWidget(&buttonLoadData);
     pButtonLayout->addWidget(&buttonFit);
+    pButtonLayout->addWidget(&buttonSaveData);
 
     pGeneralLayout = new QVBoxLayout();
     pGeneralLayout ->addLayout(pParamLayout);
@@ -92,6 +98,12 @@ ParametersWindow::onLoadData() {
         return;
     pFunction->Plot(upar.Params());
     buttonFit.setEnabled(true);
+    buttonSaveData.setEnabled(true);
+}
+
+
+void
+ParametersWindow::onSaveData() {
 }
 
 

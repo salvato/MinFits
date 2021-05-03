@@ -4,12 +4,19 @@
 #include <QWidget>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <QSettings>
+
 
 class MsgWindow : public QWidget
 {
     Q_OBJECT
 public:
     explicit MsgWindow(QWidget *parent = nullptr);
+    ~MsgWindow();
+
+protected:
+    void saveSettings();
+    void getSettings();
 
 signals:
 
@@ -18,4 +25,5 @@ public:
 
 private:
     QVBoxLayout* pGeneralLayout;
+    QSettings settings;
 };
