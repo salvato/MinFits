@@ -9,6 +9,8 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QFileDialog>
+#include <QMessageBox>
 
 
 ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
@@ -55,10 +57,23 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
     setLayout(pGeneralLayout);
 
     nParams = 0;
+    getSettings();
 }
 
 
 ParametersWindow::~ParametersWindow() {
+}
+
+
+void
+ParametersWindow::getSettings() {
+    sDataDir = settings.value("Data_Dir", QDir::currentPath()).toString();
+}
+
+
+void
+ParametersWindow::saveSettings() {
+    settings.setValue("Data_Dir", sDataDir);
 }
 
 
@@ -69,8 +84,8 @@ ParametersWindow::Add(QString sName, double initVal, double error, double minVal
     pParamLayout->addWidget(parLine.back());
     upar.Add(sName.toStdString(), initVal, error, minVal, maxVal);
     nParams++;
-    if(bFixed)
-        upar.Fix(sName.toStdString());
+    if(bFixed) upar.Fix(sName.toStdString());
+
     connect(newPar, SIGNAL(nameChanged(int)),
             this, SLOT(onNameChanged(int)));
     connect(newPar, SIGNAL(valueChanged(int)),
@@ -104,6 +119,29 @@ ParametersWindow::onLoadData() {
 
 void
 ParametersWindow::onSaveData() {
+    QString outFileName = QFileDialog::getSaveFileName(this,
+                                                       "Save Fit Data",
+                                                       sDataDir,
+                                                       "Fit Data (*.fit);;All Files (*)");
+    if(outFileName == QString())
+        return;
+
+    QFile outFile(outFileName);
+    if(outFile.exists()) {
+        QMessageBox::StandardButton answer;
+        answer = QMessageBox::question(this,
+                                       "File Already Exists",
+                                       "Overwrite ?",
+                                       QMessageBox::Yes|QMessageBox::No,
+                                       QMessageBox::No);
+        if(answer == QMessageBox::No) return;
+    }
+    if (!outFile.open(QIODevice::WriteOnly)) {
+        QMessageBox::information(this,
+                                 "Unable to open file",
+                                 outFile.errorString());
+        return;
+    }
 }
 
 

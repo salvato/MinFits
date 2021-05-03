@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QPushButton>
+#include <QSettings>
 
 #include "parameterline.h"
 //#include "summcosfunction.h"
@@ -36,7 +37,8 @@ public:
     MnUserParameters& getParams();
 
 protected:
-
+    void getSettings();
+    void saveSettings();
 
 signals:
     void closing();
@@ -66,4 +68,6 @@ private:
     QPushButton buttonSaveData;
     MinimizationFunction* pFunction;
     std::vector<ParameterLine*> parLine;
+    QString sDataDir;
+    QSettings settings;
 };

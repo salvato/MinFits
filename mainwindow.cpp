@@ -54,6 +54,7 @@ MainWindow::closeEvent(QCloseEvent *event) {
     if(pMsgWindow) delete pMsgWindow;
     pMsgWindow = nullptr;
     if(pFunctionToMinimize) delete pFunctionToMinimize;
+    pFunctionToMinimize = nullptr;
 }
 
 
@@ -94,8 +95,10 @@ MainWindow::on_SummCos_clicked() {
 
 void
 MainWindow::onFitDone() {
-    delete pParams;
+    if(pParams) delete pParams;
     pParams = nullptr;
+    if(pFunctionToMinimize) delete pFunctionToMinimize;
+    pFunctionToMinimize = nullptr;
     show();
 /*
     if(pParams->getParams().)
