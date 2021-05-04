@@ -17,20 +17,112 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
 #include "twogaussfunction.h"
-#include <QtGlobal>
+
+#include "dceul.h"
+#include "gammln.h"
+#include "plot2d.h"
+#include "math.h"
+#include <QDebug>
+#include <QFileDialog>
+#include <QApplication>
+#include <iostream>
+
+static double Tau, T1, Beta2, Tm, Beta1, T00;
+static double Omega, t0k;
+
+extern std::vector<double> theFit;
+
+
+double summTerm(int n);
 
 using namespace ROOT;
 using namespace Minuit2;
 
-TwoGaussFunction::TwoGaussFunction(const std::vector<double>& pos,
-                                   const std::vector<double>& meas)
-    : theMeasurements(meas)
-    , thePositions(pos)
-{}
+TwoGaussFunction::TwoGaussFunction()
+    : pPlot(nullptr)
+{
+    getSettings();
+    pPlot = new Plot2D(nullptr, "Two Gauss");
+    pPlot->SetLimits(0.0, 0.1, 0.0, 1.0, true, true, false, false);
+    pPlot->UpdatePlot();
+    pPlot->show();
+}
 
 
 TwoGaussFunction::~TwoGaussFunction(){
+    if(pPlot) delete pPlot;
+}
 
+
+double
+TwoGaussFunction::Up() const
+{
+    return 1.0;
+}
+
+
+void
+TwoGaussFunction::SetErrorDef(double def) {
+    theErrorDef = def;
+}
+
+
+void
+TwoGaussFunction::getSettings() {
+    sDataDir = settings.value("Data_Dir", QDir::currentPath()).toString();
+}
+
+
+void
+TwoGaussFunction::saveSettings() {
+    settings.setValue("Data_Dir", sDataDir);
+}
+
+
+bool
+TwoGaussFunction::readDataFile() {
+    QFileDialog chooseFileDialog(nullptr,
+                                 "Open SUMM-SIN Data File",
+                                 sDataDir,
+                                 "Summ Sin Data files (*.dat *.txt)");
+    chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
+    if(!chooseFileDialog.exec())
+        return false;
+
+    QString sFilename = chooseFileDialog.selectedFiles().at(0);
+    if(sFilename == QString())
+        return false;
+
+    sDataDir = chooseFileDialog.directory().absolutePath();
+    settings.setValue("Data_Dir", sDataDir);
+    QFile dataFile(sFilename);
+    if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      return false;
+    }
+    QTextStream inFileStream(&dataFile);
+    try {
+        theMeasurements.clear();
+        theTemperatures.clear();
+        theFit.clear();
+        double t, alfaS;
+        inFileStream >> Omega;
+        Omega *= 2.0*M_PI;
+        while(!inFileStream.atEnd()) {
+            inFileStream >> t >> alfaS;
+            theTemperatures.push_back(t);
+            theMeasurements.push_back(alfaS);
+            theFit.push_back(0.0);
+        }
+        dataFile.close();
+        t0k   = theTemperatures[0];
+        saveSettings();
+    } catch(...) {
+        dataFile.close();
+        return false;
+    }
+
+    dataFile.close();
+    return true;
 }
 
 
@@ -106,13 +198,3 @@ TwoGaussFunction::operator()(const std::vector<double>& par) const {
     return f;
 }
 
-double
-TwoGaussFunction::Up() const {
-    return 1.0;
-}
-
-
-void
-TwoGaussFunction::setErrorDef(double def) {
-    theErrorDef = def;
-}

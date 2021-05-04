@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "summsinfunction.h"
 
-#include "dceul.h"
+#include "krab.h"
 #include "gammln.h"
 #include "plot2d.h"
 #include "math.h"
@@ -28,13 +28,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 
-static double Tau, T1, Beta2, Tm, Beta1, T00;
-static double Omega, t0k;
+static double Beta,  Vm,  V0,  Tau, Flow1;
+static double Beta1, Vm1, V01, Tau1, Flow2;
+static double sts;
 
 extern std::vector<double> theFit;
 
 
 double summTerm(int n);
+
 
 using namespace ROOT;
 using namespace Minuit2;
@@ -68,7 +70,6 @@ void
 SummSinFunction::SetErrorDef(double def) {
     theErrorDef = def;
 }
-
 
 
 void

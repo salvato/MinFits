@@ -18,28 +18,43 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
 
-#include "Minuit2/FCNBase.h"
+#include "MinimizationFunction.h"
+#include "qglobal.h"
 #include <vector>
+#include <QSettings>
+
+
+QT_FORWARD_DECLARE_CLASS(Plot2D)
+
 
 namespace ROOT {
 
    namespace Minuit2 {
 
 
-class TwoGaussFunction : public FCNBase
+class TwoGaussFunction : public MinimizationFunction
 {
 public:
-    TwoGaussFunction(const std::vector<double>& pos,
-                     const std::vector<double>& meas);
+    TwoGaussFunction();
     ~TwoGaussFunction();
     double operator()(const std::vector<double>& par) const;
     double Up() const;
-    void setErrorDef(double def);
+    void SetErrorDef(double def);
+    void Plot(const std::vector<double>& par) const;
+    bool readDataFile();
+    void saveSettings();
+    bool saveData(QFile* pOutFile);
+
+protected:
+    void getSettings();
 
 private:
     std::vector<double> theMeasurements;
-    std::vector<double> thePositions;
+    std::vector<double> theTemperatures;
     double theErrorDef;
+    Plot2D*   pPlot;
+    QString   sDataDir;
+    QSettings settings;
 };
 
    }  // namespace Minuit2
