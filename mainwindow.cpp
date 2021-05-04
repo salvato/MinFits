@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTextStream>
 #include <QFile>
 #include <math.h>
+#include "krab.h"
 
 std::vector<double> theFit;
 
@@ -47,6 +48,16 @@ MainWindow::MainWindow(QWidget *parent)
     pMsgWindow = new MsgWindow();
     pMsgWindow->show();
     pOut = new QDebugStream(std::cout, &pMsgWindow->textEdit);
+    double vk0, vg0, vk, vg;
+    vk = 0.0;
+    vg = 0.0;
+    krab(0.0, M_PI, sin, &vk, &vg);
+    vk0 = vk;
+    vg0 = vg;
+    krab(M_PI, 2.0*M_PI, sin, &vk, &vg);
+    vk0 += vk;
+    vg0 += vg;
+    std::cout << "vk=" << vk0 << " vg=" << vg0;
 }
 
 

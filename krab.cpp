@@ -1,3 +1,22 @@
+/*
+ *
+Copyright (C) 2021  Gabriele Salvato
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*/
+#include "krab.h"
 
 // Kronrod Quadrature (n=20) of an integral from a to b.
 // a = Lower limit of integral
@@ -46,62 +65,13 @@ krab(double a, double b, double(*grand)(double), double* vk, double* vg) {
     *vg = 0.0;
     *vk = 0.08300356e-1 * grand(a+0.5*s);
 
-    DO 10 J=1,20
-    ADD=S*ABB(J)
-    ADD=GRAND(A+ADD)+GRAND(B-ADD)
-    VK=VK+WKB(J)*ADD
-    JJ=J/2
-    IF(J-2*JJ) 10,5,10
-  5 VG=VG+WGB(JJ)*ADD
-10   CONTINUE
-C
-    VK=VK*S
-    VG=VG*S
+    for(int j=0; j<20; j++) {
+        double add = s * abb[j];
+        add = grand(a+add) + grand(b-add);
+        *vk += (wkb[j] * add);
+        if(j & 1) // se j è dispari...
+            *vg += (wgb[j/2] * add);
+    }
+    *vk *= s;
+    *vg *= s;
 }
-/*
-!MS$INTEGER:4
-      SUBROUTINE KRAB(A,B,GRAND,VK,VG)                                  
-      IMPLICIT REAL *8(A-H,O-Z)                                         
-C                                                                       
-C     SUBROUTINE FOR KRONROD QUADRATURE (N=20) OF AN INTEGRAL FROM TO B.
-C     A=LOWER LIMIT OF INTEGRAL                                         
-C     B=UPPER LIMIT OF INTEGRAL                                         
-C     GRAND=EXTERNAL FUNCTION DEFINING INTEGRAND.                       
-C     VK=VALUE OF INTEGRAL USING 41 NODES                               
-C     VG=VALUE OF INTEGRAL USING 20 NODES                               
-C                                                                       
-      DIMENSION ABB(20),WGB(10),WKB(20)                                 
-      DATA WGB  /                         .88070036E-2 , .20300715E-1 , 
-     1      .31336024E-1 , .41638371E-1 , .50965060E-1 , .59097266E-1 , 
-     2      .65844319E-1 , .71048055E-1 , .74586493E-1 , .76376694E-1 / 
-      DATA WKB /                          .15367919E-2 , .43001349E-2 , 
-     1      .73130846E-2 , .10194187E-1 , .12941067E-1 , .15643653E-1 , 
-     2      .18300085E-1 , .20834437E-1 , .23217411E-1 , .25472287E-1 , 
-     3      .27597553E-1 , .29555700E-1 , .31326619E-1 , .32917299E-1 , 
-     4      .34324336E-1 , .35527212E-1 , .36515345E-1 , .37291438E-1 , 
-     5      .37852249E-1 , .38188934E-1 /                               
-      DATA ABB /                          .57048210E-3 , .34357004E-2 , 
-     1      .92460613E-2 , .18014036E-1 , .29588683E-1 , .43882786E-1 , 
-     2      .60861594E-1 , .80441514E-1 , .10247929    , .12683405    , 
-     3      .15338117    , .18197315    , .21242977    , .24456650    , 
-     4      .27820341    , .31314696    , .34918607    , .38610707    , 
-     5      .42369726    , .46173674    /                               
-C                                                                       
-      S=B-A                                                             
-      VG=0.                                                             
-      VK=.08300356E-1*GRAND(A+.5*S)                                     
-C                                                                       
-      DO 10 J=1,20                                                      
-      ADD=S*ABB(J)                                                      
-      ADD=GRAND(A+ADD)+GRAND(B-ADD)                                     
-      VK=VK+WKB(J)*ADD                                                  
-      JJ=J/2                                                            
-      IF(J-2*JJ) 10,5,10                                                
-    5 VG=VG+WGB(JJ)*ADD                                                 
- 10   CONTINUE                                                          
-C                                                                       
-      VK=VK*S                                                           
-      VG=VG*S                                                           
-      RETURN                                                            
-      END                                                               
-*/

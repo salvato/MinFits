@@ -15,11 +15,11 @@ SOURCES += \
     AxisFrame.cpp \
     AxisLimits.cpp \
     DataSetProperties.cpp \
-    Krab.cpp \
     axesdialog.cpp \
     datastream2d.cpp \
     dceul.cpp \
     gammln.cpp \
+    krab.cpp \
     main.cpp \
     mainwindow.cpp \
     msgwindow.cpp \
@@ -41,6 +41,7 @@ HEADERS += \
     datastream2d.h \
     dceul.h \
     gammln.h \
+    krab.h \
     mainwindow.h \
     msgwindow.h \
     parameterline.h \
