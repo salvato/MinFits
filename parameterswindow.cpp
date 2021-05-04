@@ -64,10 +64,10 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
     pParamLayout->addWidget(new ParameterLine());
 
     pButtonLayout = new QHBoxLayout();
-    pButtonLayout->addWidget(&buttonClose);
     pButtonLayout->addWidget(&buttonLoadData);
     pButtonLayout->addWidget(&buttonFit);
     pButtonLayout->addWidget(&buttonSaveData);
+    pButtonLayout->addWidget(&buttonClose);
 
     pGeneralLayout = new QVBoxLayout();
     pGeneralLayout ->addLayout(pParamLayout);
@@ -163,14 +163,17 @@ ParametersWindow::onSaveData() {
     }
 
     outFile.write(QString("Fit Parameters:\n").toLocal8Bit());
-    QString sString;
     for(ulong i=0; i<upar.Parameters().size(); i++) {
-        sString = QString::fromStdString(upar.Parameters().at(i).GetName());
-        outFile.write(QString("%1: %2\n")
-                      .arg(sString, 12)
+        outFile.write(QString("%1, %2, %3, %4, ")
+                      .arg(QString::fromStdString(upar.Parameters().at(i).GetName()), 12)
                       .arg(upar.Parameters().at(i).Value(), 12)
+                      .arg(upar.Parameters().at(i).Error(), 12)
+                      .arg(upar.Parameters().at(i).LowerLimit(), 12)
+                      .arg(upar.Parameters().at(i).UpperLimit(), 12)
                       .toLocal8Bit());
-
+        outFile.write(QString("%1\n")
+                      .arg(upar.Parameters().at(i).IsFixed() ? "fixed" : "free", 12)
+                      .toLocal8Bit());
     }
     pFunction->saveData(&outFile);
 }

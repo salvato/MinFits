@@ -70,6 +70,8 @@ DISTFILES += \
     .gitignore \
     DatiTest/PVB50_1Hz_absorption.dat \
     DatiTest/PVB_1Hz.dat \
+    DatiTest/summCos.par \
+    DatiTest/summSin.par \
     plot.png
 
 RESOURCES += \

@@ -26,6 +26,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFileDialog>
 #include <QTextStream>
 #include <QFile>
+#include <QMessageBox>
+
 #include <math.h>
 #include "krab.h"
 
@@ -48,16 +50,17 @@ MainWindow::MainWindow(QWidget *parent)
     pMsgWindow = new MsgWindow();
     pMsgWindow->show();
     pOut = new QDebugStream(std::cout, &pMsgWindow->textEdit);
-    double vk0, vg0, vk, vg;
-    vk = 0.0;
-    vg = 0.0;
-    krab(0.0, M_PI, sin, &vk, &vg);
-    vk0 = vk;
-    vg0 = vg;
-    krab(M_PI, 2.0*M_PI, sin, &vk, &vg);
-    vk0 += vk;
-    vg0 += vg;
-    std::cout << "vk=" << vk0 << " vg=" << vg0;
+//    double vk0, vg0, vk, vg;
+//    vk = 0.0;
+//    vg = 0.0;
+//    krab(0.0, M_PI, cos, &vk, &vg);
+//    vk0 = vk;
+//    vg0 = vg;
+//    std::cout << "integrale(cos(x)) in [0   M_PI] vk=" << vk0 << " vg=" << vg0 << endl;
+//    krab(M_PI, 2.0*M_PI, cos, &vk, &vg);
+//    vk0 += vk;
+//    vg0 += vg;
+//    std::cout << "integrale(cos(x)) in [0 2*M_PI] vk=" << vk0 << " vg=" << vg0 << endl;
 }
 
 
@@ -101,25 +104,122 @@ MainWindow::saveSettings() {
 }
 
 
+bool
+MainWindow::getSummCosInitialValues() {
+    if(!readParamFile("Open SUMM-COS Param File", "Summ Cos Param files (*.cmd *.par)"))
+        return false;
+   return true;
+}
+
+
+bool
+MainWindow::getSummSinInitialValues() {
+    if(!readParamFile("Open SUMM-Sin Param File", "Summ Sin Param files (*.cmd *.par)"))
+        return false;
+    return true;
+}
+
+
+bool
+MainWindow::readParamFile(QString sWindowTitle, QString sFileFilter) {
+    QFileDialog chooseFileDialog(nullptr,
+                                 sWindowTitle,
+                                 sDataDir,
+                                 sFileFilter);
+    chooseFileDialog.setFileMode(QFileDialog::ExistingFile);
+    if(!chooseFileDialog.exec())
+        return false;
+
+    QString sFilename = chooseFileDialog.selectedFiles().at(0);
+    if(sFilename == QString())
+        return false;
+
+    sDataDir = chooseFileDialog.directory().absolutePath();
+    settings.setValue("Data_Dir", sDataDir);
+    QFile dataFile(sFilename);
+    if(!dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      return false;
+    }
+    QString line;
+    QStringList lineElems;
+    bool ok;
+    try {
+        while(!dataFile.atEnd()) {
+            line = dataFile.readLine(100);
+            lineElems = line.split(",");
+            if(lineElems.size() < 3) {
+                QMessageBox::critical(this,
+                                      "Error",
+                                      QString("Malformed Parameter %1").arg(pParams->getParams().Params().size())
+                                      );
+                dataFile.close();
+                return false;
+            }
+            QString sName   = lineElems.at(0);
+            double value    = lineElems.at(1).toDouble(&ok);
+            double error    = lineElems.at(2).toDouble(&ok);
+            double minValue = 0.0;
+            double maxValue = 0.0;
+            if(lineElems.size() > 4) {
+                minValue = lineElems.at(3).toDouble(&ok);
+                maxValue = lineElems.at(4).toDouble(&ok);
+            }
+            bool bFixed = false;
+            if(lineElems.size() > 5)
+                bFixed = lineElems.at(5).contains(QString("fixed"));
+
+            pParams->Add(sName, value, error, minValue, maxValue, bFixed);
+        }
+        dataFile.close();
+    } catch(...) {
+        QMessageBox::critical(this,
+                              "Error",
+                              QString("Malformed File %1").arg(sFilename)
+                              );
+        dataFile.close();
+        return false;
+    }
+
+    dataFile.close();
+    return true;
+}
+
+
 void
 MainWindow::on_SummCos_clicked() {
-    if(pParams) delete pParams;
     if(pFunctionToMinimize) delete pFunctionToMinimize;
     pFunctionToMinimize = new SummCosFunction();
+
+    if(pParams) delete pParams;
     pParams = new ParametersWindow(pFunctionToMinimize, "Summ + Cos Fit Parameters", nullptr);
 
-    pParams->Add("BETA1",       1.108, 0.20880,   0.2,   5.00, false);
-    pParams->Add("BETA2",      10.520, 0.13150,   0.45,  0.58, false);
-    pParams->Add("TM(+3)",      2.172, 0.11327,   1.0,   7.00, false);
-    pParams->Add("TAU(-14)",    3.100, 0.90082,   0.1,  20.00, false);
-    pParams->Add("COST1(-3)",   9.446, 2.00700,   0.1,  20.00, false);
-    pParams->Add("T00",       258.300, 4.28760, 100.0, 400.00, false);
+    if(!getSummCosInitialValues())
+        return;
 
     connect(pParams, SIGNAL(closing()),
             this, SLOT(onFitDone()));
     hide();
     pParams->show();
 }
+
+
+void
+MainWindow::on_SummSin_clicked() {
+    if(pFunctionToMinimize) delete pFunctionToMinimize;
+    pFunctionToMinimize = new SummSinFunction();
+
+    if(pParams) delete pParams;
+    pParams = new ParametersWindow(pFunctionToMinimize, "Summ + Sin Fit Parameters", nullptr);
+
+    if(!getSummSinInitialValues())
+        return;
+
+    connect(pParams, SIGNAL(closing()),
+            this, SLOT(onFitDone()));
+    hide();
+    pParams->show();
+}
+
 
 
 void
@@ -129,29 +229,5 @@ MainWindow::onFitDone() {
     if(pFunctionToMinimize) delete pFunctionToMinimize;
     pFunctionToMinimize = nullptr;
     show();
-/*
-    if(pParams->getParams().)
-    settings.setValue(QString("MainWindow_Dialog"), saveGeometry());
-    settings.setValue("Data_Dir", sDataDir);
-*/
 }
 
-
-void
-MainWindow::on_SummSin_clicked() {
-    if(pParams) delete pParams;
-    if(pFunctionToMinimize) delete pFunctionToMinimize;
-    pFunctionToMinimize = new SummSinFunction();
-    pParams = new ParametersWindow(pFunctionToMinimize, "Summ + Sin Fit Parameters", nullptr);
-
-    pParams->Add("BETA1",       0.250, 0.20880,   0.2,   5.00, false);
-    pParams->Add("BETA2",       0.290, 0.13150,   0.1,   0.58, false);
-    pParams->Add("TM(+3)",      2.020, 0.11327,   1.0,   7.00, false);
-    pParams->Add("TAU(-14)",    3.680, 0.90082,   0.1,  20.00, false);
-    pParams->Add("T00",       119.000, 4.28760, 100.0, 400.00, false);
-
-    connect(pParams, SIGNAL(closing()),
-            this, SLOT(onFitDone()));
-    hide();
-    pParams->show();
-}

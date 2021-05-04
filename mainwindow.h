@@ -45,6 +45,9 @@ public:
 protected:
     void saveSettings();
     void getSettings();
+    bool getSummCosInitialValues();
+    bool getSummSinInitialValues();
+    bool readParamFile(QString sWindowTitle, QString sFileFilter);
 
 private slots:
     void on_SummCos_clicked();
