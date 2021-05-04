@@ -196,3 +196,59 @@ TwoGaussFunction::operator()(const std::vector<double>& par) const {
     return f;
 }
 
+
+void
+TwoGaussFunction::Plot(const std::vector<double>& par) const
+{
+//    Beta1 = par[0];
+//    Beta2 = par[1];
+//    Tm    = par[2]*1.0e+03;
+//    Tau   = par[3]*1.0e-14;
+//    T00   = par[4];
+
+    double summa;
+    double eps  = 1.0e-15;
+    int maxIter = 300;
+    int maxterm = 100;
+    for(ulong j=0; j<theMeasurements.size(); j++) {
+//        T1 = theTemperatures[j];
+//        dceul(summTerm, eps, maxIter, maxterm, &summa);
+//        theFit[j] =  Beta1*summa;
+    }
+
+    if(pPlot) {
+        pPlot->ClearDataSet(1);
+        pPlot->ClearDataSet(2);
+        pPlot->NewDataSet(1, 1, QColor(255,  0,  0), Plot2D::iplus, "Exper.");
+        pPlot->NewDataSet(2, 1, QColor(255,255,  0), Plot2D::iline, "Theory");
+        for(unsigned long i=0; i<theMeasurements.size(); i++) {
+            pPlot->NewPoint(1, theTemperatures[i], theMeasurements[i]);
+            pPlot->NewPoint(2, theTemperatures[i], theFit[i]);
+        }
+        pPlot->SetShowTitle(1, true);
+        pPlot->SetShowTitle(2, true);
+        pPlot->SetShowDataSet(1, true);
+        pPlot->SetShowDataSet(2, true);
+        pPlot->UpdatePlot();
+    }
+}
+
+
+bool
+TwoGaussFunction::saveData(QFile* pOutFile) {
+    pOutFile->write(QString("%1 %2 %3\n")
+                    .arg("Temperature", 12)
+                    .arg("Measurements", 12)
+                    .arg("Fit", 12)
+                    .toLocal8Bit());
+    for(ulong i=0; i<theMeasurements.size(); i++) {
+        pOutFile->write(QString("%1 %2 %3\n")
+                        .arg(theTemperatures[i], 12, 'g', 6, ' ')
+                        .arg(theMeasurements[i], 12, 'g', 6, ' ')
+                        .arg(theFit[i], 12, 'g', 6, ' ')
+                        .toLocal8Bit());
+    }
+    return true;
+}
+
+
