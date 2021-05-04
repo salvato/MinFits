@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "twogaussfunction.h"
 
-#include "dceul.h"
+#include "krab.h"
 #include "gammln.h"
 #include "plot2d.h"
 #include "math.h"
@@ -27,8 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <iostream>
 
-static double Tau, T1, Beta2, Tm, Beta1, T00;
-static double Omega, t0k;
+static double Beta,  Vm,  V0,  Tau, Flow1;
+static double Beta1, Vm1, V01, Tau1, Flow2;
+static double sts;
 
 extern std::vector<double> theFit;
 
@@ -105,8 +106,6 @@ TwoGaussFunction::readDataFile() {
         theTemperatures.clear();
         theFit.clear();
         double t, alfaS;
-        inFileStream >> Omega;
-        Omega *= 2.0*M_PI;
         while(!inFileStream.atEnd()) {
             inFileStream >> t >> alfaS;
             theTemperatures.push_back(t);
@@ -114,7 +113,6 @@ TwoGaussFunction::readDataFile() {
             theFit.push_back(0.0);
         }
         dataFile.close();
-        t0k   = theTemperatures[0];
         saveSettings();
     } catch(...) {
         dataFile.close();
