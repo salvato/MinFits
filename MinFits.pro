@@ -15,6 +15,7 @@ SOURCES += \
     AxisFrame.cpp \
     AxisLimits.cpp \
     DataSetProperties.cpp \
+    Krab.cpp \
     axesdialog.cpp \
     datastream2d.cpp \
     dceul.cpp \
