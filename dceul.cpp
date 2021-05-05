@@ -37,7 +37,7 @@ dceul(double (*termine)(int),
             vk1 = *vk + termine(i);
             if(*vk == vk1)
                 return 0; // Sum converged !
-            double perc = abs(vk1-*vk)/abs(vk1);
+            double perc = std::abs(vk1-*vk)/std::abs(vk1);
             if(perc < eps) { // Sum almost converged !
                 *vk = vk1;
                 return 0;
@@ -67,7 +67,7 @@ dceul(double (*termine)(int),
 //            tmp = dum;
 //        }
 //        wksp[nterm+1] = 0.5*(wksp[nterm]+tmp);
-//        if (abs(wksp[nterm+1]) <= abs(wksp[nterm]))
+//        if (std::abs(wksp[nterm+1]) <= std::abs(wksp[nterm]))
 //            *sum += (0.5*wksp[++nterm]);
 //        else
 //            *sum += wksp[nterm+1];

@@ -27,12 +27,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <iostream>
 
-static double Beta,  Vm,  V0,  Tau, Flow1;
+
+double twoGauss(double v);
+
+
+static double Beta,  Vm,  V0,  Tau,  Flow1;
 static double Beta1, Vm1, V01, Tau1, Flow2;
-static double sts;
+static double Omega, Sts;
 
 extern std::vector<double> theFit;
-
+std::vector<double> alfa1;
+std::vector<double> alfa2;
 
 double summTerm(int n);
 
@@ -106,6 +111,8 @@ TwoGaussFunction::readDataFile() {
         theTemperatures.clear();
         theFit.clear();
         double t, alfaS;
+        int nDati;
+        inFileStream >> nDati >> Omega;
         while(!inFileStream.atEnd()) {
             inFileStream >> t >> alfaS;
             theTemperatures.push_back(t);
@@ -120,6 +127,8 @@ TwoGaussFunction::readDataFile() {
     }
 
     dataFile.close();
+    alfa1.resize(theMeasurements.size());
+    alfa2.resize(theMeasurements.size());
     return true;
 }
 
@@ -139,23 +148,23 @@ TwoGaussFunction::operator()(const std::vector<double>& par) const {
     Beta1 = par[7]*1.0e-3;
     Tau1  = par[8]*1.0e-14;
     Flow2 = par[9];
-    sts   = 0.0;
+    Sts   = 0.0;
 
-//    double Diff;
-//    for(int j=0; j<theMeasurements.size(); j++) {
-//      T1 = T[j];
-//      VMax      = (log(1.0e10)-log(Omeg*Omeg*Tau*Tau))*T1*0.5;
-//      STS = 1.0;
-//      KRAB(&Flow1, &VMax, TWOGAUSS, &VK, &VG);
-//      Alfa1[j] = VK / T[j];
-//      STS = 2.0;
-//      KRAB(&Flow2, &VMax, TWOGAUSS, &VK, &VG);
-//      Alfa2[j] = VK / T[j];
-//      Alfa[j]  = Alfa1[j] + Alfa2[j];
-//      Diff     = Alfa[j] - AlfaS[j];
-//      Diff1[j] = Diff;
-//      f      += Diff*Diff;
-//    }
+    double diff, vk, vg;
+
+    for(size_t j=0; j<theMeasurements.size(); j++) {
+      double t1 = theTemperatures[j];
+      double vMax = (log(1.0e10)-log(Omega*Omega*Tau*Tau))*t1*0.5;
+      Sts = 1.0;
+      krab(Flow1, vMax, twoGauss, &vk, &vg);
+      alfa1[j] = vk / theTemperatures[j];
+      Sts = 2.0;
+      krab(Flow2, vMax, twoGauss, &vk, &vg);
+      alfa2[j] = vk / theTemperatures[j];
+      theFit[j]  = alfa1[j] + alfa2[j];
+      diff = theFit[j] - theMeasurements[j];
+      f += diff*diff;
+    }
 
     return f;
 }
@@ -174,19 +183,21 @@ TwoGaussFunction::Plot(const std::vector<double>& par) const
     Beta1 = par[7]*1.0e-3;
     Tau1  = par[8]*1.0e-14;
     Flow2 = par[9];
-    sts   = 0.0;
+    Sts   = 0.0;
 
-//    for(int j=0; j<theMeasurements.size(); j++) {
-//      T1 = T[j];
-//      VMax      = (log(1.0e10)-log(Omeg*Omeg*Tau*Tau))*T1*0.5;
-//      STS = 1.0;
-//      KRAB(&Flow1, &VMax, TWOGAUSS, &VK, &VG);
-//      Alfa1[j] = VK / T[j];
-//      STS = 2.0;
-//      KRAB(&Flow2, &VMax, TWOGAUSS, &VK, &VG);
-//      Alfa2[j] = VK / T[j];
-//      Alfa[j]  = Alfa1[j] + Alfa2[j];
-//    }
+    double vk, vg;
+
+    for(size_t j=0; j<theMeasurements.size(); j++) {
+      double t1 = theTemperatures[j];
+      double vMax = (log(1.0e10)-log(Omega*Omega*Tau*Tau))*t1*0.5;
+      Sts = 1.0;
+      krab(Flow1, vMax, twoGauss, &vk, &vg);
+      alfa1[j] = vk / theTemperatures[j];
+      Sts = 2.0;
+      krab(Flow2, vMax, twoGauss, &vk, &vg);
+      alfa2[j] = vk / theTemperatures[j];
+      theFit[j]  = alfa1[j] + alfa2[j];
+    }
 
     if(pPlot) {
         pPlot->ClearDataSet(1);
@@ -224,3 +235,41 @@ TwoGaussFunction::saveData(QFile* pOutFile) {
 }
 
 
+double
+twoGauss(double v) {
+}
+
+  DOUBLE PRECISION FUNCTION TWOGAUSS(V)
+  IMPLICIT REAL*8 (A-H,O-Z)
+  COMMON /BLOCCO/ VM,V0,OMEG,VM1,V01,TAU,TAU1,T1,BETA,BETA1,STS
+C-----------------------------------------------------------------
+  TERM01= DEXP(V/T1)
+  AR1= OMEG * TAU1 * TERM01
+  IF( AR1.LT.10.D+37) GOTO 42
+4033  GRAND1= 0.D0
+  GOTO 1010
+42 TERM11=(V-VM1)/(1.4142 * V01 )
+  T11=TERM11*TERM11
+  IF(T11.GT.150.D0) GOTO 4033
+  GRAND1=BETA1*(AR1*DEXP(-T11)/(1.D0+AR1*AR1))
+  IF(DABS(GRAND1).LT.1.D-15) GOTO 4033
+C-----------------------------------------------------------------
+1010  TERM= DEXP(V/T1)
+  AR= OMEG * TAU * TERM
+  IF( AR.LT.10.D+37) GOTO 41
+4077  TWOGAUSS= 0.D0
+  GOTO 2020
+41 TERM1=(V-VM)/(1.4142 * V0 )
+  T=TERM1*TERM1
+  IF(T.GT.150.D0) GOTO 4066
+  TWOGAUSS=BETA*(AR*DEXP(-T)/(1.D0+AR*AR))
+  GOTO 2020
+4066 TWOGAUSS=0.D0
+C-------------------------------------------------------
+2020  IF (STS.EQ.1.) GRAND1 =0.D0
+  IF (STS.EQ.2.) TWOGAUSS  =0.D0
+C**
+  TWOGAUSS=TWOGAUSS+GRAND1
+  IF(DABS(TWOGAUSS).LT.1.D-25) TWOGAUSS=0.D0
+  RETURN
+  END
