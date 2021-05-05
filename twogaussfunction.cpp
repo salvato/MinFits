@@ -176,14 +176,16 @@ TwoGaussFunction::Plot(const std::vector<double>& par) const
     Flow2 = par[9];
     sts   = 0.0;
 
-//    double summa;
-//    double eps  = 1.0e-15;
-//    int maxIter = 300;
-//    int maxterm = 100;
-//    for(ulong j=0; j<theMeasurements.size(); j++) {
-//        T1 = theTemperatures[j];
-//        dceul(summTerm, eps, maxIter, maxterm, &summa);
-//        theFit[j] =  Beta1*summa;
+//    for(int j=0; j<theMeasurements.size(); j++) {
+//      T1 = T[j];
+//      VMax      = (log(1.0e10)-log(Omeg*Omeg*Tau*Tau))*T1*0.5;
+//      STS = 1.0;
+//      KRAB(&Flow1, &VMax, TWOGAUSS, &VK, &VG);
+//      Alfa1[j] = VK / T[j];
+//      STS = 2.0;
+//      KRAB(&Flow2, &VMax, TWOGAUSS, &VK, &VG);
+//      Alfa2[j] = VK / T[j];
+//      Alfa[j]  = Alfa1[j] + Alfa2[j];
 //    }
 
     if(pPlot) {
