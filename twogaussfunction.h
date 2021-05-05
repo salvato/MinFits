@@ -52,7 +52,8 @@ private:
     std::vector<double> theMeasurements;
     std::vector<double> theTemperatures;
     double theErrorDef;
-    Plot2D*   pPlot;
+    Plot2D*   pPlot1;
+    Plot2D*   pPlot2;
     QString   sDataDir;
     QSettings settings;
 };

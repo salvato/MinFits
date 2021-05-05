@@ -33,7 +33,7 @@ double twoGauss(double v);
 
 static double Beta,  Vm,  V0,  Tau,  Flow1;
 static double Beta1, Vm1, V01, Tau1, Flow2;
-static double Omega, Sts;
+static double Omega, T1, Sts;
 
 extern std::vector<double> theFit;
 std::vector<double> alfa1;
@@ -45,18 +45,24 @@ using namespace ROOT;
 using namespace Minuit2;
 
 TwoGaussFunction::TwoGaussFunction()
-    : pPlot(nullptr)
+    : pPlot1(nullptr)
+    , pPlot2(nullptr)
 {
     getSettings();
-    pPlot = new Plot2D(nullptr, "Two Gauss");
-    pPlot->SetLimits(0.0, 0.1, 0.0, 1.0, true, true, false, false);
-    pPlot->UpdatePlot();
-    pPlot->show();
+    pPlot1 = new Plot2D(nullptr, "Two Gauss Fit");
+    pPlot1->SetLimits(0.0, 0.1, 0.0, 1.0, true, true, false, false);
+    pPlot1->UpdatePlot();
+    pPlot1->show();
+    pPlot2 = new Plot2D(nullptr, "Two Gauss");
+    pPlot2->SetLimits(0.0, 0.1, 0.0, 1.0, true, true, false, false);
+    pPlot2->UpdatePlot();
+    pPlot2->show();
 }
 
 
 TwoGaussFunction::~TwoGaussFunction(){
-    if(pPlot) delete pPlot;
+    if(pPlot1) delete pPlot1;
+    if(pPlot2) delete pPlot2;
 }
 
 
@@ -110,6 +116,8 @@ TwoGaussFunction::readDataFile() {
         theMeasurements.clear();
         theTemperatures.clear();
         theFit.clear();
+        alfa1.clear();
+        alfa2.clear();
         double t, alfaS;
         int nDati;
         inFileStream >> nDati >> Omega;
@@ -153,8 +161,8 @@ TwoGaussFunction::operator()(const std::vector<double>& par) const {
     double diff, vk, vg;
 
     for(size_t j=0; j<theMeasurements.size(); j++) {
-      double t1 = theTemperatures[j];
-      double vMax = (log(1.0e10)-log(Omega*Omega*Tau*Tau))*t1*0.5;
+      T1 = theTemperatures[j];
+      double vMax = (log(1.0e10)-log(Omega*Omega*Tau*Tau))*T1*0.5;
       Sts = 1.0;
       krab(Flow1, vMax, twoGauss, &vk, &vg);
       alfa1[j] = vk / theTemperatures[j];
@@ -199,20 +207,35 @@ TwoGaussFunction::Plot(const std::vector<double>& par) const
       theFit[j]  = alfa1[j] + alfa2[j];
     }
 
-    if(pPlot) {
-        pPlot->ClearDataSet(1);
-        pPlot->ClearDataSet(2);
-        pPlot->NewDataSet(1, 1, QColor(255,  0,  0), Plot2D::iplus, "Exper.");
-        pPlot->NewDataSet(2, 1, QColor(255,255,  0), Plot2D::iline, "Theory");
-        for(unsigned long i=0; i<theMeasurements.size(); i++) {
-            pPlot->NewPoint(1, theTemperatures[i], theMeasurements[i]);
-            pPlot->NewPoint(2, theTemperatures[i], theFit[i]);
+    if(pPlot1) {
+        pPlot1->ClearDataSet(1);
+        pPlot1->ClearDataSet(2);
+        pPlot1->NewDataSet(1, 1, QColor(255,  0,  0), Plot2D::iplus, "Exper.");
+        pPlot1->NewDataSet(2, 1, QColor(255,255,  0), Plot2D::iline, "Theory");
+        for(size_t i=0; i<theMeasurements.size(); i++) {
+            pPlot1->NewPoint(1, theTemperatures[i], theMeasurements[i]);
+            pPlot1->NewPoint(2, theTemperatures[i], theFit[i]);
         }
-        pPlot->SetShowTitle(1, true);
-        pPlot->SetShowTitle(2, true);
-        pPlot->SetShowDataSet(1, true);
-        pPlot->SetShowDataSet(2, true);
-        pPlot->UpdatePlot();
+        pPlot1->SetShowTitle(1, true);
+        pPlot1->SetShowTitle(2, true);
+        pPlot1->SetShowDataSet(1, true);
+        pPlot1->SetShowDataSet(2, true);
+        pPlot1->UpdatePlot();
+    }
+    if(pPlot2) {
+      pPlot2->ClearDataSet(1);
+      pPlot2->ClearDataSet(2);
+      pPlot2->NewDataSet(1, 1, QColor(255,  0,  0), Plot2D::iline, "Alfa 1");
+      pPlot2->NewDataSet(2, 1, QColor(255,255,  0), Plot2D::iline, "Alfa 2");
+      for(size_t i=0; i<theMeasurements.size(); i++) {
+        pPlot2->NewPoint(1, theTemperatures[i], alfa1[i]);
+        pPlot2->NewPoint(2, theTemperatures[i], alfa2[i]);
+      }
+      pPlot2->SetShowTitle(1, true);
+      pPlot2->SetShowTitle(2, true);
+      pPlot2->SetShowDataSet(1, true);
+      pPlot2->SetShowDataSet(2, true);
+      pPlot2->UpdatePlot();
     }
 }
 
@@ -237,24 +260,30 @@ TwoGaussFunction::saveData(QFile* pOutFile) {
 
 double
 twoGauss(double v) {
+    double Term11, T11, Grand1;
+    double Term01= pow(v, T1);
+    double ar1= Omega * Tau1 * Term01;
+
+    if(ar1 < __FLT_MIN__) {
+        Term11 = (v-Vm1)/(1.4142*V01);
+        T11 = Term11*Term11;
+        if(T11 > 150.0)
+            Grand1 = 0.0;
+        else {
+            Grand1 = Beta1 * (ar1*exp(-T11)/(1.0+ar1*ar1));
+            if(std::abs(Grand1) < 1.0e-15)
+                Grand1 = 0.0;
+        }
+    }
+    else {
+        Grand1 = 0.0;
+    }
+
+    return Grand1;//NOOOOOOOOOOOOOO
 }
 
-  DOUBLE PRECISION FUNCTION TWOGAUSS(V)
-  IMPLICIT REAL*8 (A-H,O-Z)
-  COMMON /BLOCCO/ VM,V0,OMEG,VM1,V01,TAU,TAU1,T1,BETA,BETA1,STS
-C-----------------------------------------------------------------
-  TERM01= DEXP(V/T1)
-  AR1= OMEG * TAU1 * TERM01
-  IF( AR1.LT.10.D+37) GOTO 42
-4033  GRAND1= 0.D0
-  GOTO 1010
-42 TERM11=(V-VM1)/(1.4142 * V01 )
-  T11=TERM11*TERM11
-  IF(T11.GT.150.D0) GOTO 4033
-  GRAND1=BETA1*(AR1*DEXP(-T11)/(1.D0+AR1*AR1))
-  IF(DABS(GRAND1).LT.1.D-15) GOTO 4033
-C-----------------------------------------------------------------
-1010  TERM= DEXP(V/T1)
+/*
+  TERM= DEXP(V/T1)
   AR= OMEG * TAU * TERM
   IF( AR.LT.10.D+37) GOTO 41
 4077  TWOGAUSS= 0.D0
@@ -273,3 +302,4 @@ C**
   IF(DABS(TWOGAUSS).LT.1.D-25) TWOGAUSS=0.D0
   RETURN
   END
+*/
