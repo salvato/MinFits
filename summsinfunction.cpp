@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+#define _USE_MATH_DEFINES
 #include "summsinfunction.h"
 
 #include "dceul.h"
@@ -149,7 +150,7 @@ SummSinFunction::operator()(const std::vector<double>& par) const
         T1 = theTemperatures[j];
         if(dceul(summTerm, Eps, Iter, Maxterm, &summa)) {
             //std::cout << "La Serie non converge\n";
-            summa = __DBL_MAX__;
+            summa = std::numeric_limits<double>::max();
         }
         theFit[j] =  Beta1*summa;
         diff = theFit[j] - theMeasurements[j];
@@ -235,7 +236,7 @@ summTerm(int n) {
 
     double result = term2 * term3 * exp(term4);
     if(!qIsFinite(result))
-        result = __FLT_MAX__;
+        result =  std::numeric_limits<float>::max();
 
     // (-1)^(n-1) : n > 0
     if((n-1)/2*2 != (n-1))

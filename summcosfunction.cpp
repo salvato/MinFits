@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+#define _USE_MATH_DEFINES
 #include "summcosfunction.h"
 #include "dceul.h"
 #include "gammln.h"
@@ -25,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QFileDialog>
 #include <QApplication>
 #include <iostream>
+#include <cmath>
 
 
 static double Tau, T1, Beta2, Tm, Beta1, Cost1, T00;
@@ -148,7 +150,7 @@ SummCosFunction::operator()(const std::vector<double>& par) const
         T1 = theTemperatures[j];
         if(dceul(summCosTerm, Eps, Iter, Maxterm, &summa)) {
             //std::cout << "La Serie non converge";
-            summa = __DBL_MAX__;
+            summa =  std::numeric_limits<double>::max();
         }
         theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1*summa);
         diff = theFit[j] - theMeasurements[j];
@@ -242,7 +244,7 @@ summCosTerm(int n) {
 
     double result = term2 * term3 * exp(term4);
     if(!qIsFinite(result))
-        result = __FLT_MAX__;
+        result = std::numeric_limits<float>::max();
 
     // (-1)^(n-1) : n > 0
     if((n-1)/2*2 != (n-1))

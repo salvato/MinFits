@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
 #include "dceul.h"
-#include "math.h"
+#include <cmath>
 
 // Calcola una sommatoria infinita troncandola
 // quando non ha senso calcolare ulteriori termini
