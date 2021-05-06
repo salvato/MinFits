@@ -82,6 +82,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 DISTFILES += \
     .gitignore \
     DatiTest/PVB50_1Hz_absorption.dat \
+    DatiTest/PVB80new alpha1+2-1 Hz_parameters.dat \
+    DatiTest/PVB80new alpha1+2_1Hz.dat \
     DatiTest/PVB_1Hz.dat \
     DatiTest/summCos.par \
     DatiTest/summSin.par \
