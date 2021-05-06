@@ -29,8 +29,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 
-static double Tau, T1, Beta2, Tm, Beta1, T00;
-static double Omega, t0k;
+static double Tau, Beta2, Tm, Beta1, T00;
+static double Omega, T1, t0k;
 
 extern std::vector<double> theFit;
 
@@ -215,8 +215,6 @@ SummSinFunction::saveData(QFile* pOutFile) {
 }
 
 
-//----------------------------------------------------------------
-//----------------------------------------------------------------
 double
 summTerm(int n) {
     double term  = Omega * Tau * exp(Tm/(T1-T00));
@@ -225,15 +223,6 @@ summTerm(int n) {
     term2 = 1.0/term2;
     double term3 = sin(term1 * M_PI_2);
     double term4 = gammln(term1+1.0)-gammln(double(n)+1.0);
-
-//    qDebug() << "n="          << n
-//             << "term="       << term
-//             << "term1="      << term1
-//             << "term2="      << term2
-//             << "term3="      << term3
-//             << "term4="      << term4
-//             << "exp(term4)=" << exp(term4);
-
     double result = term2 * term3 * exp(term4);
     if(!qIsFinite(result))
         result =  std::numeric_limits<float>::max();
