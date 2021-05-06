@@ -16,6 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
+#define _USE_MATH_DEFINES
 #include "twogaussfunction.h"
 
 #include "krab.h"
@@ -264,7 +265,7 @@ twoGauss(double v) {
     double Term01= pow(v, T1);
     double ar1= Omega * Tau1 * Term01;
 
-    if(ar1 < __FLT_MIN__) {
+    if(ar1 < std::numeric_limits<float>::min()) {
         Term11 = (v-Vm1)/(1.4142*V01);
         T11 = Term11*Term11;
         if(T11 > 150.0)
