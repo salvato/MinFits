@@ -29,13 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 
 
-static double Tau_a, Beta2_a, Tm_a, Beta1_a, T00_a;
+static double Tau_a, Beta1_a, Tm_a, Beta2_a, T00_a;
+static double Tau_b, Beta1_b, Tm_b, Beta2_b, T00_b;
 static double Omega, T1, t0k;
 
 extern std::vector<double> theFit;
 
 
-double summTerm(int n);
+double summTerm_a(int n);
+double summTerm_b(int n);
 
 
 using namespace ROOT;
@@ -142,17 +144,28 @@ SummSinFunction::operator()(const std::vector<double>& par) const
     Tau_a   = par[3]*1.0e-14;
     T00_a   = par[4];
 
-    double Eps  = 1.0e-15;
-    int Iter    = 300;
-    int Maxterm = 100;
+    Beta1_b = par[5];
+    Beta2_b = par[6];
+    Tm_b    = par[7]*1.0e+03;
+    Tau_b   = par[8]*1.0e-14;
+    T00_b   = par[9];
+
+    double eps  = 1.0e-15;
+    int maxIter = 300;
+    int maxTerm = 100;
     double f    = 0.0;
     for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
-        if(dceul(summTerm, Eps, Iter, Maxterm, &summa)) {
+        if(dceul(summTerm_a, eps, maxIter, maxTerm, &summa)) {
             //std::cout << "La Serie non converge\n";
             summa = std::numeric_limits<double>::max();
         }
         theFit[j] =  Beta1_a*summa;
+        if(dceul(summTerm_b, eps, maxIter, maxTerm, &summa)) {
+            //std::cout << "La Serie non converge\n";
+            summa = std::numeric_limits<double>::max();
+        }
+        theFit[j] +=  Beta1_b*summa;
         diff = theFit[j] - theMeasurements[j];
         f += (diff * diff);
     }
@@ -169,14 +182,25 @@ SummSinFunction::Plot(const std::vector<double>& par) const
     Tau_a   = par[3]*1.0e-14;
     T00_a   = par[4];
 
+    Beta1_b = par[5];
+    Beta2_b = par[6];
+    Tm_b    = par[7]*1.0e+03;
+    Tau_b   = par[8]*1.0e-14;
+    T00_b   = par[9];
+
     double summa;
     double eps  = 1.0e-15;
     int maxIter = 300;
-    int maxterm = 100;
+    int maxTerm = 100;
     for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
-        dceul(summTerm, eps, maxIter, maxterm, &summa);
+        dceul(summTerm_a, eps, maxIter, maxTerm, &summa);
         theFit[j] =  Beta1_a*summa;
+        if(dceul(summTerm_b, eps, maxIter, maxTerm, &summa)) {
+            //std::cout << "La Serie non converge\n";
+            summa = std::numeric_limits<double>::max();
+        }
+        theFit[j] +=  Beta1_b*summa;
     }
 
     if(pPlot) {
@@ -216,7 +240,7 @@ SummSinFunction::saveData(QFile* pOutFile) {
 
 
 double
-summTerm(int n) {
+summTerm_a(int n) {
     double term  = Omega * Tau_a * exp(Tm_a/(T1-T00_a));
     double term1 = double(n)*Beta2_a;
     double term2 = pow(term, term1);
@@ -232,6 +256,24 @@ summTerm(int n) {
         result= -result;
 
     return result;
-
 }
 
+
+double
+summTerm_b(int n) {
+    double term  = Omega * Tau_b * exp(Tm_b/(T1-T00_b));
+    double term1 = double(n)*Beta2_b;
+    double term2 = pow(term, term1);
+    term2 = 1.0/term2;
+    double term3 = sin(term1 * M_PI_2);
+    double term4 = gammln(term1+1.0)-gammln(double(n)+1.0);
+    double result = term2 * term3 * exp(term4);
+    if(!qIsFinite(result))
+        result =  std::numeric_limits<float>::max();
+
+    // (-1)^(n-1) : n > 0
+    if((n-1)/2*2 != (n-1))
+        result= -result;
+
+    return result;
+}
