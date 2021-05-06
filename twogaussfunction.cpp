@@ -279,7 +279,21 @@ twoGauss(double v) {
         Grand1 = 0.0;
     }
 
-    return Grand1;//NOOOOOOOOOOOOOO
+    double Term = pow(v, T1);
+    double ar = Omega * Tau * Term;
+    IF( AR.LT.10.D+37) GOTO 41
+  4077  TWOGAUSS= 0.D0
+    GOTO 2020
+  41 TERM1=(V-VM)/(1.4142 * V0 )
+    T=TERM1*TERM1
+    IF(T.GT.150.D0) GOTO 4066
+    TWOGAUSS=BETA*(AR*DEXP(-T)/(1.D0+AR*AR))
+    GOTO 2020
+  4066 TWOGAUSS=0.D0
+  C-------------------------------------------------------
+  2020  CONTINUE
+    IF (STS.EQ.1.) GRAND1 =0.D0
+    IF (STS.EQ.2.) TWOGAUSS  =0.D0
 }
 
 /*
@@ -295,7 +309,8 @@ twoGauss(double v) {
   GOTO 2020
 4066 TWOGAUSS=0.D0
 C-------------------------------------------------------
-2020  IF (STS.EQ.1.) GRAND1 =0.D0
+2020  CONTINUE
+      IF (STS.EQ.1.) GRAND1 =0.D0
   IF (STS.EQ.2.) TWOGAUSS  =0.D0
 C**
   TWOGAUSS=TWOGAUSS+GRAND1
