@@ -120,7 +120,7 @@ TwoGaussFunction::readDataFile() {
         alfa2.clear();
         double t, alfaS;
         int nDati;
-        inFileStream >> nDati >> Omega;
+        inFileStream >> nDati >> Omega; // Nel file c'è direttamente Omega
         while(!inFileStream.atEnd()) {
             inFileStream >> t >> alfaS;
             theTemperatures.push_back(t);
@@ -278,7 +278,7 @@ twoGauss(double v) {
     else {
         Grand1 = 0.0;
     }
-
+/*
     double Term = pow(v, T1);
     double ar = Omega * Tau * Term;
     IF( AR.LT.10.D+37) GOTO 41
@@ -294,6 +294,8 @@ twoGauss(double v) {
   2020  CONTINUE
     IF (STS.EQ.1.) GRAND1 =0.D0
     IF (STS.EQ.2.) TWOGAUSS  =0.D0
+*/
+    return 0.0; // <================
 }
 
 /*
