@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QObject>
 #include <QWidget>
+#include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QTextEdit>
@@ -84,7 +85,6 @@ protected:
 
 private:
     int number;
-    QLineEdit paramNumber;
     QLineEdit editName;
     QLineEdit editInitialValue;
     QLineEdit editErrorValue;

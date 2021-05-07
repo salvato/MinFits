@@ -86,12 +86,14 @@ ParametersWindow::~ParametersWindow() {
 
 void
 ParametersWindow::getSettings() {
+    restoreGeometry(settings.value(QString("Parameters")).toByteArray());
     sDataDir = settings.value("Data_Dir", QDir::currentPath()).toString();
 }
 
 
 void
 ParametersWindow::saveSettings() {
+    settings.setValue(QString("Parameters"), saveGeometry());
     settings.setValue("Data_Dir", sDataDir);
 }
 

@@ -30,8 +30,6 @@ ParameterLine::ParameterLine(int num,
     : QWidget(parent)
     , number(num)
 {
-    paramNumber.setText(QString("").arg(num));
-    paramNumber.setReadOnly(true);
     editName.setText(sName);
     editInitialValue.setText(sInitialValue);
     editErrorValue.setText(sErrorValue);
@@ -56,8 +54,6 @@ ParameterLine::ParameterLine(int num,
     : QWidget(parent)
     , number(num)
 {
-    paramNumber.setText(QString("%1").arg(num));
-    paramNumber.setReadOnly(true);
     editName.setText(sName);
     editInitialValue.setText(QString("%1").arg(initialValue));
     editErrorValue.setText(QString("%1").arg(errorValue));
@@ -73,7 +69,6 @@ ParameterLine::ParameterLine(int num,
 
 
 ParameterLine::ParameterLine() {
-    paramNumber.setText("N°");
     editName.setText("Name");
     editInitialValue.setText("Start");
     editErrorValue.setText("Error");
@@ -83,14 +78,12 @@ ParameterLine::ParameterLine() {
     checkFixed.setDisabled(true);
     checkFixed.setText("Fixed");
 
-    paramNumber.setReadOnly(true);
     editName.setReadOnly(true);
     editInitialValue.setReadOnly(true);
     editErrorValue.setReadOnly(true);
     editMinValue.setReadOnly(true);
     editMaxValue.setReadOnly(true);
 
-    paramNumber.setAlignment( Qt::AlignCenter);
     editName.setAlignment( Qt::AlignCenter);
     editInitialValue.setAlignment( Qt::AlignCenter);
     editErrorValue.setAlignment( Qt::AlignCenter);
@@ -105,7 +98,6 @@ ParameterLine::SetLayout() {
     checkFixed.setText("Fixed");
     auto* mainLayout = new QHBoxLayout();
     mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addWidget(&paramNumber);
     mainLayout->addWidget(&editName);
     mainLayout->addWidget(&editInitialValue);
     mainLayout->addWidget(&editErrorValue);
