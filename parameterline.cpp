@@ -104,6 +104,7 @@ void
 ParameterLine::SetLayout() {
     checkFixed.setText("Fixed");
     auto* mainLayout = new QHBoxLayout();
+    mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->addWidget(&paramNumber);
     mainLayout->addWidget(&editName);
     mainLayout->addWidget(&editInitialValue);
