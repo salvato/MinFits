@@ -30,19 +30,20 @@ dceul(double (*termine)(int),
       double* vk)
 {
     *vk  = 0.0;
-    double vk1;
+    double vk1, vk2;
     for(int j=0; j<iter; j++) {
         int k = j * maxterm;
-        for(int i=k+1; i<=k+maxterm; i++) {
+        for(int i=k+1; i<=k+maxterm; i+=2) {
             vk1 = *vk + termine(i);
-            if(*vk == vk1)
+            vk2 = vk1 + termine(i+1);
+            if(*vk == vk2)
                 return 0; // Sum converged !
-            double perc = std::abs(vk1-*vk)/std::abs(vk1);
+            double perc = std::abs(vk2-*vk)/std::abs(vk2);
             if(perc < eps) { // Sum almost converged !
-                *vk = vk1;
+                *vk = vk2;
                 return 0;
             }
-            *vk = vk1;
+            *vk = vk2;
         }
     }
     return -maxterm;// Sum does not converge !
