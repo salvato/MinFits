@@ -146,16 +146,7 @@ ParametersWindow::onSaveData() {
         return;
 
     QFile outFile(outFileName);
-    if(outFile.exists()) {
-        QMessageBox::StandardButton answer;
-        answer = QMessageBox::question(this,
-                                       "File Already Exists",
-                                       "Overwrite ?",
-                                       QMessageBox::Yes|QMessageBox::No,
-                                       QMessageBox::No);
-        if(answer == QMessageBox::No) return;
-    }
-    if (!outFile.open(QIODevice::WriteOnly)) {
+    if(!outFile.open(QIODevice::WriteOnly)) {
         QMessageBox::information(this,
                                  "Unable to open file",
                                  outFile.errorString());
@@ -164,7 +155,7 @@ ParametersWindow::onSaveData() {
 
     outFile.write(QString("Fit Parameters:\n").toLocal8Bit());
     for(ulong i=0; i<upar.Parameters().size(); i++) {
-        outFile.write(QString("%1, %2, %3, %4, ")
+        outFile.write(QString("%1, %2, %3, %4, %5, ")
                       .arg(QString::fromStdString(upar.Parameters().at(i).GetName()), 12)
                       .arg(upar.Parameters().at(i).Value(), 12)
                       .arg(upar.Parameters().at(i).Error(), 12)

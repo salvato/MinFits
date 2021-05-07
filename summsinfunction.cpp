@@ -157,16 +157,18 @@ SummSinFunction::operator()(const std::vector<double>& par) const
     for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
         if(dceul(summTerm_a, eps, maxIter, maxTerm, &summa)) {
-            //std::cout << "La Serie non converge\n";
+            std::cout << "La Serie non converge\n";
             summa = std::numeric_limits<double>::max();
         }
         theFit[j] =  Beta1_a*summa;
         if(dceul(summTerm_b, eps, maxIter, maxTerm, &summa)) {
-            //std::cout << "La Serie non converge\n";
+            std::cout << "La Serie non converge\n";
             summa = std::numeric_limits<double>::max();
         }
         theFit[j] +=  Beta1_b*summa;
         diff = theFit[j] - theMeasurements[j];
+        if(std::abs(diff) > 1.0e10)
+            qDebug() << diff;
         f += (diff * diff);
     }
     return f;
@@ -194,13 +196,18 @@ SummSinFunction::Plot(const std::vector<double>& par) const
     int maxTerm = 100;
     for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
-        dceul(summTerm_a, eps, maxIter, maxTerm, &summa);
+        if(dceul(summTerm_a, eps, maxIter, maxTerm, &summa)) {
+                //std::cout << "La Serie non converge\n";
+                summa = std::numeric_limits<double>::max();
+        }
         theFit[j] =  Beta1_a*summa;
         if(dceul(summTerm_b, eps, maxIter, maxTerm, &summa)) {
             //std::cout << "La Serie non converge\n";
             summa = std::numeric_limits<double>::max();
         }
         theFit[j] +=  Beta1_b*summa;
+        if(std::abs(theFit[j]) > 1.0e10)
+            qDebug() << theFit[j];
     }
 
     if(pPlot) {
@@ -241,15 +248,19 @@ SummSinFunction::saveData(QFile* pOutFile) {
 
 double
 summTerm_a(int n) {
+    //if(T1 > 270.0) return 0.0;
     double term  = Omega * Tau_a * exp(Tm_a/(T1-T00_a));
     double term1 = double(n)*Beta2_a;
     double term2 = pow(term, term1);
     term2 = 1.0/term2;
+    if(!qIsFinite(term2)) return 0.0;
+    //term2 = std::numeric_limits<float>::max();
+
     double term3 = sin(term1 * M_PI_2);
     double term4 = gammln(term1+1.0)-gammln(double(n)+1.0);
     double result = term2 * term3 * exp(term4);
-    if(!qIsFinite(result))
-        result =  std::numeric_limits<float>::max();
+    if(!qIsFinite(result)) return 0.0;
+    //result = std::numeric_limits<float>::max();
 
     // (-1)^(n-1) : n > 0
     if((n-1)/2*2 != (n-1))
@@ -261,15 +272,17 @@ summTerm_a(int n) {
 
 double
 summTerm_b(int n) {
+    //if(T1 < 200.0) return 0.0;
     double term  = Omega * Tau_b * exp(Tm_b/(T1-T00_b));
     double term1 = double(n)*Beta2_b;
     double term2 = pow(term, term1);
     term2 = 1.0/term2;
+    if(!qIsFinite(term2)) return 0.0;
+
     double term3 = sin(term1 * M_PI_2);
     double term4 = gammln(term1+1.0)-gammln(double(n)+1.0);
     double result = term2 * term3 * exp(term4);
-    if(!qIsFinite(result))
-        result =  std::numeric_limits<float>::max();
+    if(!qIsFinite(result)) return 0.0;
 
     // (-1)^(n-1) : n > 0
     if((n-1)/2*2 != (n-1))
