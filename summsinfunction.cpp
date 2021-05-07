@@ -167,8 +167,7 @@ SummSinFunction::operator()(const std::vector<double>& par) const
         }
         theFit[j] +=  Beta1_b*summa;
         diff = theFit[j] - theMeasurements[j];
-        if(std::abs(diff) > 1.0e10)
-            qDebug() << diff;
+
         f += (diff * diff);
     }
     return f;
@@ -206,8 +205,6 @@ SummSinFunction::Plot(const std::vector<double>& par) const
             summa = std::numeric_limits<double>::max();
         }
         theFit[j] +=  Beta1_b*summa;
-        if(std::abs(theFit[j]) > 1.0e10)
-            qDebug() << theFit[j];
     }
 
     if(pPlot) {

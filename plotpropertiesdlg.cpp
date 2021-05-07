@@ -221,7 +221,7 @@ plotPropertiesDlg::onChangeLabelsFont() {
         painterFontSize   = painterFont.pointSize();
         painterFontWeight = QFont::Weight(painterFont.weight());
         painterFontItalic = painterFont.italic();
-        qDebug() << painterFontName << painterFontSize <<painterFontWeight;
+        //qDebug() << painterFontName << painterFontSize <<painterFontWeight;
         emit configChanged();
     }
 }
