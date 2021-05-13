@@ -191,7 +191,7 @@ ParametersWindow::onFit() {
         sPrint = QString("Minuit did succesfully converge.\n");
     }
     else {
-        sPrint = QString("Warning: Minuit did not converge.\n");
+        sPrint = QString("WARNING: Minuit did not converge.\n");
     }
     pMsgWindow->addLine(sPrint);
     pMsgWindow->addLine(QString("#of function calls: %1\n").arg(min.NFcn()));
