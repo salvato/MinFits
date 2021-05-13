@@ -31,6 +31,7 @@ class MsgWindow : public QWidget
 public:
     explicit MsgWindow(QWidget *parent = nullptr);
     ~MsgWindow();
+    void addLine(QString sString);
 
 protected:
     void saveSettings();

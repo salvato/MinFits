@@ -182,19 +182,28 @@ ParametersWindow::onSaveData() {
 
 void
 ParametersWindow::onFit() {
+    QString sPrint;
     QApplication::setOverrideCursor(QCursor(Qt::BusyCursor));
     setDisabled(true);
     MnMigrad migrad(*pFunction, getParams());
     FunctionMinimum min = migrad();
     if(min.IsValid()) {
-        std::cout << "Minuit succesfully converg." << std::endl;
+        sPrint = QString("Minuit did succesfully converge.\n");
     }
     else {
-        std::cout << "Warning: Minuit did not converge." << std::endl;
+        sPrint = QString("Warning: Minuit did not converge.\n");
     }
-    std::cout << "#of function calls: " << min.NFcn() << std::endl;
-    std::cout << "#minimum function Value: " << min.Fval() << std::endl;
-    std::cout << "minimum edm: " << min.Edm() << std::endl;
+    pMsgWindow->addLine(sPrint);
+    pMsgWindow->addLine(QString("#of function calls: %1\n").arg(min.NFcn()));
+    pMsgWindow->addLine(QString("minimum function Value: %1\n").arg(min.Fval()));
+    pMsgWindow->addLine(QString("minimum edm: %1\n").arg(min.Edm()));
+    pMsgWindow->addLine(QString("minimum internal state vector: LAVector parameters:\n"));
+    for(unsigned int i=0; i<min.Parameters().Vec().size(); i++) {
+        pMsgWindow->addLine(QString("%1\n"). arg(min.Parameters().Vec()(i)));
+    }
+
+
+    std::cout << "minimum: " << min << std::endl;
 /*
 minimum:
 WARNING: Minuit did not converge.
@@ -246,7 +255,6 @@ WARNING: FunctionMinimum is invalid:
      Edm is above max
 
 */
-    std::cout << "minimum: " << min << std::endl;
     pFunction->Plot(min.UserParameters().Params());
     MnUserParameterState optimum = min.UserState();
     if(qIsFinite(optimum.Edm())) {

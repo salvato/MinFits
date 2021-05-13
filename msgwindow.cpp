@@ -54,3 +54,8 @@ MsgWindow::saveSettings() {
     settings.setValue(QString("MsgWindow"), saveGeometry());
 }
 
+
+void
+MsgWindow::addLine(QString sString) {
+    textEdit.insertPlainText(sString);
+}
