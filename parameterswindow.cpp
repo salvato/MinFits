@@ -36,6 +36,8 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
                                    QWidget *parent)
     : QWidget(parent)
     , pFunction(pMyFunction)
+    , pOut(nullptr)
+    , pMsgWindow(nullptr)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
@@ -76,11 +78,17 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
 
     nParams = 0;
     getSettings();
+
+    pMsgWindow = new MsgWindow();
+    pMsgWindow->show();
+    pOut = new QDebugStream(std::cout, &pMsgWindow->textEdit);
 }
 
 
 ParametersWindow::~ParametersWindow() {
     saveSettings();
+    if(pOut) delete pOut;
+    if(pMsgWindow) delete pMsgWindow;
 }
 
 
@@ -179,7 +187,7 @@ ParametersWindow::onFit() {
     MnMigrad migrad(*pFunction, getParams());
     FunctionMinimum min = migrad();
     if(min.IsValid()) {
-        std::cout << "Minuit succesfully converged." << std::endl;
+        std::cout << "Minuit succesfully converg." << std::endl;
     }
     else {
         std::cout << "Warning: Minuit did not converge." << std::endl;

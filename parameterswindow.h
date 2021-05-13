@@ -23,6 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QPushButton>
 #include <QSettings>
 
+#include <qdebugstream.h>
+#include "msgwindow.h"
+
 #include "parameterline.h"
 //#include "summcosfunction.h"
 #include "MinimizationFunction.h"
@@ -88,4 +91,6 @@ private:
     std::vector<ParameterLine*> parLine;
     QString sDataDir;
     QSettings settings;
+    QDebugStream* pOut;
+    MsgWindow* pMsgWindow;
 };

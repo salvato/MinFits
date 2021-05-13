@@ -22,9 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QTextEdit>
 #include <QSettings>
 
-#include "qdebugstream.h"
 #include "parameterswindow.h"
-#include "msgwindow.h"
 #include "MinimizationFunction.h"
 
 
@@ -56,9 +54,7 @@ private slots:
 
 private:
     Ui::MainWindow*       pUi;
-    QDebugStream*         pOut;
     ParametersWindow*     pParams;
-    MsgWindow*            pMsgWindow;
     MinimizationFunction* pFunctionToMinimize;
 
 private:

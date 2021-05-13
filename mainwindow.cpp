@@ -40,16 +40,11 @@ using namespace Minuit2;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , pUi(new Ui::MainWindow)
-    , pOut(nullptr)
     , pParams(nullptr)
-    , pMsgWindow(nullptr)
     , pFunctionToMinimize(nullptr)
 {
     pUi->setupUi(this);
     getSettings();
-    pMsgWindow = new MsgWindow();
-    pMsgWindow->show();
-    pOut = new QDebugStream(std::cout, &pMsgWindow->textEdit);
 //    double vk0, vg0, vk, vg;
 //    vk = 0.0;
 //    vg = 0.0;
@@ -66,9 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() {
     if(pUi) delete pUi;
-    if(pOut) delete pOut;
     if(pParams) delete pParams;
-    if(pMsgWindow) delete pMsgWindow;
     if(pFunctionToMinimize) delete pFunctionToMinimize;
 }
 
@@ -79,12 +72,8 @@ MainWindow::closeEvent(QCloseEvent *event) {
     saveSettings();
     if(pUi) delete pUi;
     pUi = nullptr;
-    if(pOut) delete pOut;
-    pOut = nullptr;
     if(pParams) delete pParams;
     pParams = nullptr;
-    if(pMsgWindow) delete pMsgWindow;
-    pMsgWindow = nullptr;
     if(pFunctionToMinimize) delete pFunctionToMinimize;
     pFunctionToMinimize = nullptr;
 }
