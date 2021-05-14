@@ -28,7 +28,6 @@ SOURCES += \
     parameterswindow.cpp \
     plot2d.cpp \
     plotpropertiesdlg.cpp \
-    qdebugstream.cpp \
     summcosfunction.cpp \
     summsinfunction.cpp \
     twogaussfunction.cpp
@@ -49,7 +48,6 @@ HEADERS += \
     parameterswindow.h \
     plot2d.h \
     plotpropertiesdlg.h \
-    qdebugstream.h \
     summcosfunction.h \
     summsinfunction.h \
     twogaussfunction.h

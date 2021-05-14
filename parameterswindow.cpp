@@ -36,7 +36,6 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
                                    QWidget *parent)
     : QWidget(parent)
     , pFunction(pMyFunction)
-    , pOut(nullptr)
     , pMsgWindow(nullptr)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -81,13 +80,11 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
 
     pMsgWindow = new MsgWindow();
     pMsgWindow->show();
-    pOut = new QDebugStream(std::cout, &pMsgWindow->textEdit);
 }
 
 
 ParametersWindow::~ParametersWindow() {
     saveSettings();
-    if(pOut) delete pOut;
     if(pMsgWindow) delete pMsgWindow;
 }
 
