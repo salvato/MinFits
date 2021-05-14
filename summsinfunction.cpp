@@ -140,6 +140,8 @@ SummSinFunction::readDataFile() {
             theFit.push_back(0.0);
         }
         dataFile.close();
+        if(theMeasurements.size() == 0)
+            return false;
         t0k   = theTemperatures[0];
         saveSettings();
     } catch(...) {
