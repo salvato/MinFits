@@ -17,6 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 *
 */
 #include "msgwindow.h"
+#include <QIcon>
 
 MsgWindow::MsgWindow(QWidget *parent)
     : QWidget(parent)
@@ -25,6 +26,7 @@ MsgWindow::MsgWindow(QWidget *parent)
     setWindowFlags(windowFlags() & ~Qt::WindowCloseButtonHint);
     setWindowFlags(windowFlags() |  Qt::WindowMinMaxButtonsHint);
     setMouseTracking(true);
+    setWindowIcon(QIcon(":/plot.png"));
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pGeneralLayout = new QVBoxLayout();

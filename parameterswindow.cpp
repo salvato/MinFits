@@ -44,6 +44,7 @@ ParametersWindow::ParametersWindow(MinimizationFunction* pMyFunction,
     setMouseTracking(true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setWindowTitle(title);
+    setWindowIcon(QIcon(":/plot.png"));
 
     buttonClose.setText("Close");
     buttonLoadData.setText("Load Data");

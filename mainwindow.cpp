@@ -45,17 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     pUi->setupUi(this);
     getSettings();
-//    double vk0, vg0, vk, vg;
-//    vk = 0.0;
-//    vg = 0.0;
-//    krab(0.0, M_PI, cos, &vk, &vg);
-//    vk0 = vk;
-//    vg0 = vg;
-//    std::cout << "integrale(cos(x)) in [0   M_PI] vk=" << vk0 << " vg=" << vg0 << endl;
-//    krab(M_PI, 2.0*M_PI, cos, &vk, &vg);
-//    vk0 += vk;
-//    vg0 += vg;
-//    std::cout << "integrale(cos(x)) in [0 2*M_PI] vk=" << vk0 << " vg=" << vg0 << endl;
+    setWindowIcon(QIcon(":/plot.png"));
 }
 
 
