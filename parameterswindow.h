@@ -27,9 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "msgwindow.h"
 
 #include "parameterline.h"
-//#include "summcosfunction.h"
+
 #include "MinimizationFunction.h"
 #include "Minuit2/MnUserParameters.h"
+#include "Minuit2/FunctionMinimum.h"
 
 
 QT_FORWARD_DECLARE_CLASS(QVBoxLayout)
@@ -60,6 +61,7 @@ public:
 protected:
     void getSettings();
     void saveSettings();
+    void printResults(FunctionMinimum& min);
 
 signals:
     void closing();
