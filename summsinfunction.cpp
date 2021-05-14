@@ -107,15 +107,34 @@ SummSinFunction::readDataFile() {
       return false;
     }
     QTextStream inFileStream(&dataFile);
+    QString sLine;
+    QStringList sData;
+    bool ok;
     try {
         theMeasurements.clear();
         theTemperatures.clear();
         theFit.clear();
         double t, alfaS;
-        inFileStream >> Omega;
+        sLine = inFileStream.readLine();
+        Omega = sLine.toDouble(&ok);
+        if(!ok) {
+            dataFile.close();
+            return false;
+        }
         Omega *= 2.0*M_PI;
         while(!inFileStream.atEnd()) {
-            inFileStream >> t >> alfaS;
+            sLine = inFileStream.readLine();
+            if(sLine.length() == 0)
+                continue;
+            QStringList sData(sLine.split(QRegExp("\\s+")));
+            if(sData.size() < 2)
+                continue;
+            t = sData.at(0).toDouble(&ok);
+            if(!ok)
+                continue;
+            alfaS = sData.at(1).toDouble(&ok);
+            if(!ok)
+                continue;
             theTemperatures.push_back(t);
             theMeasurements.push_back(alfaS);
             theFit.push_back(0.0);
