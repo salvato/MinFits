@@ -30,6 +30,8 @@ ParameterLine::ParameterLine(int num,
     : QWidget(parent)
     , number(num)
 {
+    SetStyles();
+
     editName.setText(sName);
     editInitialValue.setText(sInitialValue);
     editErrorValue.setText(sErrorValue);
@@ -39,7 +41,6 @@ ParameterLine::ParameterLine(int num,
 
     SetLayout();
     ConnectSignals();
-    SetStyles();
 }
 
 
@@ -54,6 +55,8 @@ ParameterLine::ParameterLine(int num,
     : QWidget(parent)
     , number(num)
 {
+    SetStyles();
+
     editName.setText(sName);
     editInitialValue.setText(QString("%1").arg(initialValue));
     editErrorValue.setText(QString("%1").arg(errorValue));
@@ -64,11 +67,18 @@ ParameterLine::ParameterLine(int num,
 
     SetLayout();
     ConnectSignals();
-    SetStyles();
 }
 
 
 ParameterLine::ParameterLine() {
+    SetStyles();
+
+    editName.setStyleSheet(sHeaderStyle);
+    editInitialValue.setStyleSheet(sHeaderStyle);
+    editErrorValue.setStyleSheet(sHeaderStyle);
+    editMinValue.setStyleSheet(sHeaderStyle);
+    editMaxValue.setStyleSheet(sHeaderStyle);
+
     editName.setText("Name");
     editInitialValue.setText("Start");
     editErrorValue.setText("Error");
@@ -134,6 +144,12 @@ ParameterLine::SetStyles() {
     sErrorStyle +=     "background: rgb(255, 0, 0);";
     sErrorStyle +=     "selection-background-color: rgb(128, 128, 255);";
     sErrorStyle += "}";
+
+    sHeaderStyle  = "QLineEdit { ";
+    sHeaderStyle +=     "color: rgb(223, 223, 255);";
+    sHeaderStyle +=     "background: rgb(8, 8, 128);";
+    sHeaderStyle +=     "selection-background-color: rgb(128, 128, 255);";
+    sHeaderStyle += "}";
 }
 
 

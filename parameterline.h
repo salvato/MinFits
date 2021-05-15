@@ -94,4 +94,5 @@ private:
     // QLineEdit styles
     QString sNormalStyle;
     QString sErrorStyle;
+    QString sHeaderStyle;
 };
