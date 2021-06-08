@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #define _USE_MATH_DEFINES
 #include "summcosfunction.h"
+
 #include "dceul.h"
 #include "gammln.h"
 #include "plot2d.h"
@@ -29,12 +30,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <cmath>
 
 
-static double Tau, T1, Beta2, Tm, Beta1, Cost1, T00;
+static double Tau_a, Beta2_a, Tm_a, Beta1_a, T00_a;
+static double Tau_b, Beta2_b, Tm_b, Beta1_b, T00_b;
+static double Cost1, T1;
 static double Omega, costk, t0k;
+
 extern std::vector<double> theFit;
 
 
-double summCosTerm(int n);
+double summCosTerm_a(int n);
+double summCosTerm_b(int n);
 
 using namespace ROOT;
 using namespace Minuit2;
@@ -156,25 +161,38 @@ SummCosFunction::operator()(const std::vector<double>& par) const
 {
     double diff, summa;
 
-    Beta1 = par[0];
-    Beta2 = par[1];
-    Tm    = par[2]*1.0e+03;
-    Tau   = par[3]*1.0e-14;
-    Cost1 = par[4]*1.0e-03;
-    T00   = par[5];
+    Beta1_a = par[0];
+    Beta2_a = par[1];
+    Tm_a    = par[2]*1.0e+03;
+    Tau_a   = par[3]*1.0e-14;
+    T00_a   = par[4];
 
-    double Eps  = 1.0e-15;
-    int Iter    = 300;
-    int Maxterm = 100;
+    Beta1_b = par[5];
+    Beta2_b = par[6];
+    Tm_b    = par[7]*1.0e+03;
+    Tau_b   = par[8]*1.0e-14;
+    T00_b   = par[9];
+
+    Cost1 = par[10]*1.0e-03;
+
+    double eps  = 1.0e-15;
+    int maxIter = 300;
+    int maxTerm = 100;
     double f    = 0.0;
-    for(unsigned long j=0; j<theMeasurements.size(); j++) {
+    for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
-        if(dceul(summCosTerm, Eps, Iter, Maxterm, &summa)) {
-            //std::cout << "La Serie non converge";
+        if(dceul(summCosTerm_a, eps, maxIter, maxTerm, &summa)) {
+            std::cout << "La Serie non converge";
             summa =  std::numeric_limits<double>::max();
         }
-        theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1*summa);
+        theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1_a*summa);
+        if(dceul(summCosTerm_b, eps, maxIter, maxTerm, &summa)) {
+            std::cout << "La Serie non converge";
+            summa =  std::numeric_limits<double>::max();
+        }
+        theFit[j] -=  Beta1_b*summa;
         diff = theFit[j] - theMeasurements[j];
+
         f += (diff * diff);
     }
     return f;
@@ -184,22 +202,37 @@ SummCosFunction::operator()(const std::vector<double>& par) const
 void
 SummCosFunction::Plot(const std::vector<double>& par) const
 {
-
-    Beta1 = par[0];
-    Beta2 = par[1];
-    Tm    = par[2]*1.0e+03;
-    Tau   = par[3]*1.0e-14;
-    Cost1 = par[4]*1.0e-03;
-    T00   = par[5];
-
     double summa;
+
+    Beta1_a = par[0];
+    Beta2_a = par[1];
+    Tm_a    = par[2]*1.0e+03;
+    Tau_a   = par[3]*1.0e-14;
+    T00_a   = par[4];
+
+    Beta1_b = par[5];
+    Beta2_b = par[6];
+    Tm_b    = par[7]*1.0e+03;
+    Tau_b   = par[8]*1.0e-14;
+    T00_b   = par[9];
+
+    Cost1 = par[10]*1.0e-03;
+
     double eps  = 1.0e-15;
     int maxIter = 300;
-    int maxterm = 100;
-    for(unsigned long j=0; j<theMeasurements.size(); j++) {
+    int maxTerm = 100;
+    for(ulong j=0; j<theMeasurements.size(); j++) {
         T1 = theTemperatures[j];
-        dceul(summCosTerm, eps, maxIter, maxterm, &summa);
-        theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1*summa);
+        if(dceul(summCosTerm_a, eps, maxIter, maxTerm, &summa)) {
+            std::cout << "La Serie non converge";
+            summa =  std::numeric_limits<double>::max();
+        }
+        theFit[j] =  costk - Cost1*(T1-t0k) - (Beta1_a*summa);
+        if(dceul(summCosTerm_b, eps, maxIter, maxTerm, &summa)) {
+            std::cout << "La Serie non converge";
+            summa =  std::numeric_limits<double>::max();
+        }
+        theFit[j] -=  Beta1_b*summa;
     }
 
     if(pPlot) {
@@ -244,33 +277,44 @@ SummCosFunction::saveData(QFile* pOutFile) {
 //     ANARMONICA DELLO STESSO E CON IL TEMPO DI RILASSAMENTO
 //     ESPRESSO DAL VTF:TM = D*T0
 //----------------------------------------------------------------
-double
-summCosTerm(int n) {
-// COMMON /BLOCCO1/ OMEGA, TAU, T1, BETA2, TM, BETA1, COST1, T00
 
-    double term  = Omega * Tau * exp(Tm/(T1-T00));
-    double term1 = double(n)*Beta2;
+double
+summCosTerm_a(int n) {
+    double term  = Omega * Tau_a * exp(Tm_a/(T1-T00_a));
+    double term1 = double(n)*Beta2_a;
     double term2 = pow(term, term1);
     term2 = 1.0/term2;
+    if(!qIsFinite(term2)) return 0.0;
+
     double term3 = cos(term1 * M_PI_2);
     double term4 = gammln(term1+1.0)-gammln(double(n)+1.0);
-
-//    qDebug() << "n="          << n
-//             << "term="       << term
-//             << "term1="      << term1
-//             << "term2="      << term2
-//             << "term3="      << term3
-//             << "term4="      << term4
-//             << "exp(term4)=" << exp(term4);
-
     double result = term2 * term3 * exp(term4);
-    if(!qIsFinite(result))
-        result = std::numeric_limits<float>::max();
+    if(!qIsFinite(result)) return 0.0;
 
     // (-1)^(n-1) : n > 0
     if((n-1)/2*2 != (n-1))
         result= -result;
 
     return result;
+}
 
+
+double
+summCosTerm_b(int n) {
+    double term  = Omega * Tau_b * exp(Tm_b/(T1-T00_b));
+    double term1 = double(n)*Beta2_b;
+    double term2 = pow(term, term1);
+    term2 = 1.0/term2;
+    if(!qIsFinite(term2)) return 0.0;
+
+    double term3 = cos(term1 * M_PI_2);
+    double term4 = gammln(term1+1.0)-gammln(double(n)+1.0);
+    double result = term2 * term3 * exp(term4);
+    if(!qIsFinite(result)) return 0.0;
+
+    // (-1)^(n-1) : n > 0
+    if((n-1)/2*2 != (n-1))
+        result= -result;
+
+    return result;
 }
